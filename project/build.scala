@@ -36,8 +36,8 @@ object ProjectBuild extends Build {
   /**
    * top layer  pythia
    */
-  lazy val pythia = Project (
-    "matrix",
+  lazy val neuralProject = Project (
+    "neuralNetwork",
     file ("."),
     settings = buildSettings++ Seq (resolvers :=  Seq(), libraryDependencies ++=Seq())
 
