@@ -5,14 +5,6 @@ import collection.mutable.ListBuffer
 import fjn.pythia.analytics.commons.NNMatrixExtensions
 
 
-/**
- * Created by IntelliJ IDEA.
- * User: fran
- * Date: 11/25/11
- * Time: 6:33 PM
- * To change this template use File | Settings | File Templates.
- */
-
 trait WeightUpdater  {
 
   self: NNTrainingCtes =>
