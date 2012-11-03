@@ -1,4 +1,4 @@
-package fjn.pythia.analytics.neuralNetwork.multilayer
+package org.fjn.neuralNetwork.multilayer
 
 /**
  * Created by IntelliJ IDEA.

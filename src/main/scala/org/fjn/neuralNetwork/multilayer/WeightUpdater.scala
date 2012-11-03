@@ -1,39 +1,42 @@
-package fjn.pythia.analytics.neuralNetwork.multilayer
+package org.fjn.neuralNetwork.multilayer
 
-import scalala.tensor.dense.DenseMatrix
+
 import collection.mutable.ListBuffer
-import fjn.pythia.analytics.commons.NNMatrixExtensions
+import org.fjn.matrix._
 
 
-trait WeightUpdater  {
+trait WeightUpdater {
 
   self: NNTrainingCtes =>
 
-  def clearWeights():Unit={
+  def clearWeights(): Unit = {
     Ws.clear()
     dWs.clear()
   }
-  protected  var Ws = new ListBuffer[DenseMatrix[Double]]
-  protected  var dWs = new ListBuffer[DenseMatrix[Double]]
 
-  def resolveWeights():Unit={
+  protected var Ws = new ListBuffer[Matrix[Double]]
+  protected var dWs = new ListBuffer[Matrix[Double]]
+
+  def resolveWeights(): Unit = {
 
 
-
-     for (i <- 0 until dWs.length){
-      applyFunction(x => x * alpha,dWs(i))
-      Ws(i) -=  dWs(i)
+    for (i <- 0 until dWs.length) {
+      dWs(i) = dWs(i) * alpha
+      Ws(i) = Ws(i) - dWs(i)
     }
   }
 
-  def initWeights(size:Seq[Int]):Unit={
+  def initWeights(size: Seq[Int]): Unit = {
 
     for (n <- 1 until size.length) {
-      Ws += (DenseMatrix.rand(size(n - 1) + 1, size(n))-0.5 * 2.0)
-      
+      val nM = new Matrix[Double](size(n - 1) + 1, size(n))
+      nM.random
+      Ws += nM
+
       //applyFunction(x => x*0.01,Ws.last)
-      
-      dWs += DenseMatrix.zeros[Double](size(n - 1) + 1, size(n))
+
+      val nM2 = new Matrix[Double](size(n - 1) + 1, size(n))
+      dWs += nM2
     }
 
     //val dd = math.sqrt ( Ws.head.numRows.toDouble)
@@ -41,51 +44,49 @@ trait WeightUpdater  {
     //applyFunction(x => x/dd,Ws.head)
   }
 
-  def GetWeightCopy():ListBuffer[DenseMatrix[Double]]={
-    val cpyW = new ListBuffer[DenseMatrix[Double]]()
-    Ws.foreach(w => cpyW+=w.copy)
+  def GetWeightCopy(): ListBuffer[Matrix[Double]] = {
+    val cpyW = new ListBuffer[Matrix[Double]]()
+    Ws.foreach(w => cpyW += w.clone())
 
     cpyW
   }
-  def cleardW():Unit={
-    dWs.foreach(dw => applyFunction(_=> 0.0,dw))
+
+  def cleardW(): Unit = {
+    dWs.foreach(dw => dw.zeros)
   }
 }
 
-trait WeightUpdaterSimple  extends WeightUpdater {
+trait WeightUpdaterSimple extends WeightUpdater {
 
-   self: NNTrainingCtes =>
+  self: NNTrainingCtes =>
 
-  type WNet = ListBuffer[DenseMatrix[Double]]
+  type WNet = ListBuffer[Matrix[Double]]
   val timeWindow = new ListBuffer[WNet]
 
 
-  private def addWNet()
-  {
-    val w =  dWs.toArray
-    val w2 = new ListBuffer[DenseMatrix[Double]]()
-    w.foreach(x => w2+=x)
+  private def addWNet() {
+    val w = dWs.toArray
+    val w2 = new ListBuffer[Matrix[Double]]()
+    w.foreach(x => w2 += x)
 
-    timeWindow.insert(0,w2)
+    timeWindow.insert(0, w2)
 
-    if(timeWindow.length>maxWindow){
-      while(timeWindow.length > maxWindow)
-        timeWindow.remove(timeWindow.length-1)
+    if (timeWindow.length > maxWindow) {
+      while (timeWindow.length > maxWindow)
+        timeWindow.remove(timeWindow.length - 1)
     }
   }
 
-  override def resolveWeights():Unit={
+  override def resolveWeights(): Unit = {
 
     super.resolveWeights()
-    timeWindow.foreach(wnet =>
-    {
+    timeWindow.foreach(wnet => {
       var i = 0;
-      while(i<wnet.length)
-      {
-        wnet(i) = wnet(i).copy* self.beta
+      while (i < wnet.length) {
+        wnet(i) = wnet(i) * self.beta
 
-        Ws(i)-= wnet(i)
-        i+=1
+        Ws(i) -= wnet(i)
+        i += 1
       }
     })
 

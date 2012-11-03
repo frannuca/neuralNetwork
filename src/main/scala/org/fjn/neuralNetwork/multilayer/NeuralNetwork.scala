@@ -1,31 +1,25 @@
 package org.fjn.neuralNetwork.multilayer
 
-/**
- * Created by group of one
- * User: fran
- * Date: 11/6/11
- * Time: 10:04 PM
- */
-//import no.uib.cipr.matrix.{DenseVector, DenseMatrix, Matrix}
-//import collection.mutable.ListBuffer
-
+import org.fjn.matrix.{Matrix,Scalar}
+import org.fjn.matrix.Scalar2MatrixConversions._
+import org.fjn.neuralNetwork.common.NNMatrixExtensions
 
 import collection.mutable.ListBuffer
 import scala.util.Random
 
 abstract class NeuralNetworkBase(layerDim: Seq[Int]) extends triggerFunction with Normalizer
 with WeightUpdater
-with NNMatrixExtensions
-with trainingSetLoader {
+with trainingSetLoader
+with NNMatrixExtensions{
 
 
   self: NNTrainingCtes =>
 
   private var numberOfLayers: Int = 0
-  private val Ds = new ListBuffer[DenseMatrix[Double]]()
+  private val Ds = new ListBuffer[Matrix[Double]]()
 
-  private var out = new ListBuffer[DenseMatrix[Double]]()
-  private val deltas = new ListBuffer[DenseMatrix[Double]]()
+  private var out = new ListBuffer[Matrix[Double]]()
+  private val deltas = new ListBuffer[Matrix[Double]]()
 
   var Size: Seq[Int] = null
 
@@ -42,9 +36,9 @@ with trainingSetLoader {
     out.clear()
 
     for (n <- 1 until size.length) {
-      Ds += DenseMatrix.zeros[Double](size(n), size(n))
-      deltas += DenseMatrix.zeros[Double](size(n), 1)
-      out += DenseMatrix.zeros[Double](size(n) + 1, 1)
+      Ds += new Matrix[Double](size(n), size(n)).zeros
+      deltas += new Matrix[Double](size(n), 1).zeros
+      out += new Matrix[Double](size(n) + 1, 1).zeros
     }
 
     initWeights(size)
@@ -52,7 +46,7 @@ with trainingSetLoader {
   }
 
 
-  def apply(x: DenseMatrix[Double]): DenseMatrix[Double] = {
+  def apply(x: Matrix[Double]): Matrix[Double] = {
     if (numberOfLayers < 2)
       sys.error("invalid network layout. No network can have less than 3 layers: Input-Hidden-Output")
     else {
@@ -60,38 +54,30 @@ with trainingSetLoader {
       var n: Int = 0
 
       var o = fillOnes(x)
-      applyFunction(f, o)
-      setOnes(o)
-
-
-
+      setOnes(o <= f _)
 
       while (n < numberOfLayers) {
 
 
-        val outr = (o.t * Ws(n)).t.toDense
+        val outr = fillOnes((o.transpose * Ws(n)).transpose <= f _)
 
-
-        applyFunction(f, outr)
-        o = fillOnes(outr)
         n += 1
       }
 
 
-      sub(o)
+      o.sub(0 until o.numberRows-1,0 until o.numberCols)
     }
 
   }
 
 
-  def forward(x: DenseMatrix[Double], t: DenseMatrix[Double]): Unit = {
+  def forward(x: Matrix[Double], t: Matrix[Double]): Unit = {
     if (numberOfLayers < 2)
       sys.error("invalid network layout. No network can have less than 3 layers: Input-Hidden-Output")
     else {
       var o = fillOnes(x)
-      applyFunction(f, o)
-      setOnes(o)
 
+      setOnes(o <= f _)
 
       var n: Int = 0
 
@@ -99,15 +85,13 @@ with trainingSetLoader {
       while (n < numberOfLayers) {
 
 
-        out(n) = fillOnes((o.t * Ws(n)).t.toDense)
-        val on = out(n)
-        Ds(n) = toEye(sub(out(n)).copy)
-        applyFunction(df, Ds(n))
+        out(n) = fillOnes((o.transpose * Ws(n)).transpose)
+        Ds(n) = toEye(sub(out(n)))
+        Ds(n) <= df _
+        setOnes(out(n) <= f _)
 
 
-        applyFunction(f, out(n))
-        setOnes(out(n))
-        o = out(n).copy
+        o = out(n).clone()
         n += 1
       }
     }
@@ -118,7 +102,7 @@ with trainingSetLoader {
   var totalErr: Double = 0
 
 
-  def backward(x: DenseMatrix[Double], t: DenseMatrix[Double]): Unit = {
+  def backward(x: Matrix[Double], t: Matrix[Double]): Unit = {
     if (numberOfLayers < 2)
       sys.error("invalid network layout. No network can have less than 3 layers: Input-Hidden-Output")
     else {
@@ -128,16 +112,16 @@ with trainingSetLoader {
       // println(err.toString)
       val err = (sub(out(n)) - t)
       deltas(n) = Ds(n) * err
-      val dW = (deltas(n) * out(n - 1).t.toDense).t.toDense
+      val dW = (deltas(n) * out(n - 1).transpose).transpose
 
-      dWs(n) += dW
+      dWs(n) = dWs(n)+ dW
 
       n -= 1
       while (n > 0) {
         deltas(n) = Ds(n) * sub(Ws(n + 1)) * deltas(n + 1)
         val m1 = deltas(n)
         val m2 = out(n - 1)
-        val dWb = (deltas(n) * out(n - 1).t.toDense).t.toDense
+        val dWb = (deltas(n) * out(n - 1).transpose).transpose
 
         dWs(n) += dWb
         n -= 1
@@ -202,7 +186,7 @@ with trainingSetLoader {
 
               val oonn = this.apply(input)
               val errM = (oonn - output)
-              val xx = (errM.t * errM)
+              val xx = (errM.transpose * errM)
               totalErr += xx(0, 0)
 
             }
@@ -241,7 +225,7 @@ with trainingSetLoader {
         for ( k <- 0 until trainingSet.length)
         {
           //println(normalizeX(trainingSet(k)._1).t.toString + " -> " + deNormalizeY(this.apply(normalizeX(trainingSet(k)._1))).toString() + "--->" +  trainingSet(k)._2.toString)
-          println((trainingSet(k)._1).t.toString + " -> " + deNormalizeY(this.apply(normalizeX(trainingSet(k)._1))).toString() + "--->" +  (trainingSet(k)._2).toString)
+          println((trainingSet(k)._1).transpose.toString + " -> " + deNormalizeY(this.apply(normalizeX(trainingSet(k)._1))).toString() + "--->" +  (trainingSet(k)._2).toString)
         }
 
 
