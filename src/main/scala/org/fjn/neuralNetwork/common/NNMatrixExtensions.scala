@@ -5,7 +5,7 @@ import org.fjn.matrix.Matrix
 
 trait NNMatrixExtensions {
   def setOnes(m: Matrix[Double]): Unit = {
-    for (i <- 0 until m.numberRows) {
+    for (i <- 0 until m.numberCols) {
       m.set(m.numberRows - 1, i, 1.0)
     }
   }
@@ -43,7 +43,9 @@ trait NNMatrixExtensions {
 
 
   def toEye(d: Matrix[Double]): Matrix[Double] = {
-    new Matrix[Double](d.numberRows, d.numberRows) <= (0 until d.numberRows).map(i =>d(i,0)).toSeq;
+    val r = new Matrix[Double](d.numberRows, d.numberRows)
+    (0 until d.numberRows).map(i =>(i,d(i,0))).toSeq.foreach(v => r.set(v._1,v._1,v._2));
+    r
   }
 
 

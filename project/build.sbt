@@ -17,6 +17,10 @@ resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositori
 
 resolvers += "sbt-idea-repo" at "http://mpeltonen.github.com/maven/"
 
+resolvers ++= Seq("snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
+                    "releases"  at "http://oss.sonatype.org/content/repositories/releases")
+
+
 //addSbtPlugin("org.specs2" % "specs2_2.9.2" % "1.11" % "test")
 
 //addSbtPlugin("com.github.mpeltonen" % "sbt-idea" % "1.1.0")

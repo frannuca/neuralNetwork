@@ -61,6 +61,7 @@ with NNMatrixExtensions{
 
         val outr = fillOnes((o.transpose * Ws(n)).transpose <= f _)
 
+        o = outr
         n += 1
       }
 
