@@ -17,7 +17,7 @@ class NN_test extends  Specification {
 
 
 
-     val nn = new NeuralNetwork(List(2,3,3,1))
+     val nn = new NeuralNetwork(List(2,2,2,2,1))
 
 
     val err = nn.train(NNTestUtils.generateSet1(),true)

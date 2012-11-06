@@ -9,7 +9,7 @@ package org.fjn.neuralNetwork.multilayer
  */
 
 trait NNTrainingCtes {
-  var alpha:Double = 0.1
-  val beta:Double = 0.05
-  val maxWindow:Int  = 10
+  var alpha:Double = 0.05
+  val beta:Double = 0.01
+  val maxWindow:Int  = 5
 }
