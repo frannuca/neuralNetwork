@@ -8,12 +8,11 @@ import collection.mutable.ListBuffer
 import scala.util.Random
 
 abstract class NeuralNetworkBase(layerDim: Seq[Int]) extends triggerFunction with Normalizer
+with NNTrainingCtes
 with WeightUpdater
 with trainingSetLoader
 with NNMatrixExtensions{
 
-
-  self: NNTrainingCtes =>
 
   private var numberOfLayers: Int = 0
   private val Ds = new ListBuffer[Matrix[Double]]()
@@ -244,14 +243,3 @@ with NNMatrixExtensions{
 }
 
 
-class NeuralNetwork(layerDim: Seq[Int]) extends NeuralNetworkBase(layerDim) with Sigmoidea with MaxMinNormalizer with WeightUpdaterSimple with NNTrainingCtes {
-
-  alpha = 0.01
-  override val beta = 0.1
-  override val maxWindow = 5
-
-
-  val c = 1d;
-
-
-}

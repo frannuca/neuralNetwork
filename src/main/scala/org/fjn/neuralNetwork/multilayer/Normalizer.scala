@@ -29,7 +29,7 @@ trait Normalizer {
 
       var average = new Matrix[Double](x.head.numberRows, x.head.numberCols)
       average.zeros
-    
+
       var counter = 0;
       x.foreach(input => {
         average += input
@@ -59,7 +59,7 @@ trait Normalizer {
 
     var auxMaxX = new Matrix[Double](x.head.numberRows, 1)
     auxMaxX.zeros - 1e9
-    
+
     var auxMinX = new Matrix[Double](x.head.numberRows, 1)
     auxMinX.zeros + 1e9
 
@@ -71,7 +71,7 @@ trait Normalizer {
       var k: Int = 0
 
       while (k < m.numberRows) {
-        if (auxMaxX(k, 0) < m(k, 0)) auxMaxX.set(k, 0,m(k, 0))  
+        if (auxMaxX(k, 0) < m(k, 0)) auxMaxX.set(k, 0,m(k, 0))
         if (auxMinX(k, 0) > m(k, 0)) auxMinX.set(k, 0 , m(k, 0))
         k += 1
       }
