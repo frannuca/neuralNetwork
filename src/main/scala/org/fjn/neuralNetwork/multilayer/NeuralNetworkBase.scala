@@ -143,7 +143,7 @@ with NNMatrixExtensions{
         var wCopy = GetWeightCopy()
         var cc = 0
         var keepGoing = true
-        while (cc < 90000 && keepGoing) {
+        while (cc < 1000 && keepGoing) {
 
           cc += 1
 
