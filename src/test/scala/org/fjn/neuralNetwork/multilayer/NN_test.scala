@@ -2,6 +2,9 @@ package org.fjn.neuralNetwork.multilayer
 
 import org.specs2.mutable.Specification
 import java.io.FileOutputStream
+import org.fjn.neuralNetwork.reader.{NetworkData, Network}
+import org.fjn.neuralNetwork.reader.activation.ActivationFunction
+import org.fjn.matrix.Matrix
 
 
 class NN_test extends  Specification {
@@ -17,10 +20,40 @@ class NN_test extends  Specification {
 
 
 
-     val nn = new FeedForwardNN(List(2,5,5,1))
+
+    val nn2 = new Network(NetworkData(
+      layerDimensions = List(2,4,4,1),
+      activationFunction= new ActivationFunction{
+        def trigger = f _
+        def diffTrigger = df _
+
+        val c = 1.0
+        def f(x: Double): Double = {
+          val a = (1.0 - math.exp(-c * x)) / (1.0 + math.exp(-c * x))
+          a
+        }
+
+        def df(x: Double): Double = {
+          val a = (f(x + 1e-7) - f(x - 1e-7)) / 2e-7
+          a
+        }
+      },
+      samplesFilename=NNTestUtils.generateSet1()))
+    val err = nn2.solve(0,1000)
+    println("total Err"+err.toString)
+     //val nn = new FeedForwardNN(List(2,5,5,1))
 
 
-    val err = nn.train(NNTestUtils.generateSet1(),true)
+
+    val sbld = new StringBuilder()
+    sbld.append(0).append(",").append(0).append(";").append(1).append(";").append(nn2(new Matrix[Double](2,1) <= Seq(0.0,0.0))).append("\r\n")
+    sbld.append(0).append(",").append(1).append(";").append(0).append(";").append(nn2(new Matrix[Double](2,1) <= Seq(0.0,1.0))).append("\r\n")
+    sbld.append(1).append(",").append(0).append(";").append(0).append(";").append(nn2(new Matrix[Double](2,1) <= Seq(1.0,0.0))).append("\r\n")
+    sbld.append(1).append(",").append(1).append(";").append(1).append(";").append(nn2(new Matrix[Double](2,1) <= Seq(1.0,1.0))).append("\r\n")
+
+    println(sbld.toString())
+
+    //val err = nn.train(NNTestUtils.generateSet1(),true)
 
     err < 0.1
 
