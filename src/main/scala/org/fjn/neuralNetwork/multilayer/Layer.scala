@@ -1,4 +1,4 @@
-package org.fjn.neuralNetwork.reader
+package org.fjn.neuralNetwork.multilayer
 
 import activation.ActivationFunction
 import org.fjn.matrix.Matrix

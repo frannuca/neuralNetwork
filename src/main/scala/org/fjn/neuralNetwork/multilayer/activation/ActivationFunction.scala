@@ -1,4 +1,4 @@
-package org.fjn.neuralNetwork.reader.activation
+package org.fjn.neuralNetwork.multilayer.activation
 
 /**
  * Created with IntelliJ IDEA.
