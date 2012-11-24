@@ -4,12 +4,13 @@ import org.fjn.matrix.Matrix
 import org.fjn.neuralNetwork.common.NNMatrixExtensions
 
 
-trait LearningAlgorithm extends NNMatrixExtensions{
+trait LearningAlgorithm extends NNMatrixExtensions with OptimizationCtes{
    self: Network =>
   def learn(sample:TrainingData)
 
  protected def forward(x:Matrix[Double]):Matrix[Double]={
 
+   applyMasks
     var in = x
     self.layers(0)(in,true)
     (1 until self.layers.length).foreach( n => {
@@ -36,6 +37,9 @@ trait BackPropagation extends LearningAlgorithm{
     val x = sample.input
     val t = sample.output
 
+
+    //We save the current dW for later momentum addition
+
     if (layers.length < 3)
       sys.error("invalid network layout. No network can have less than 3 layers: Input-Hidden-Output")
     else {
@@ -57,9 +61,6 @@ trait BackPropagation extends LearningAlgorithm{
 
       n -= 1
       while (n > 0) {
-        //TODO: is this correct?
-        Ws((n-1,n)) <:= masks((n-1,n))
-
         val Ds = self.layers(n).getDMatrix
         val delta = Ds * sub(self.Ws((n,n+1))) * deltasPlus
         val dWb = (delta *fillOnes(layers(n-1).getProcessedOutput).transpose).transpose
@@ -68,7 +69,10 @@ trait BackPropagation extends LearningAlgorithm{
         self.dWs((n-1,n)) = self.dWs((n-1,n)) + dWb
         n -= 1
       }
+
+
     }
+
   }
 
 

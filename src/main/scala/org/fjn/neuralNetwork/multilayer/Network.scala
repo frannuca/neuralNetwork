@@ -20,6 +20,8 @@ abstract class Network(nnData:NetworkData)
   import nnData._
 
 
+
+
   lazy protected val trainingSet:TrainingSet= new TrainingSet(samplesFilename)
 
 
@@ -46,19 +48,10 @@ abstract class Network(nnData:NetworkData)
   lazy protected val layers: Seq[Layer] = for (n <- 0 until layerDimensions.length) yield {new Layer(layerDimensions(n),activationFunction)}
 
 
-
-
-
-
-
-  lazy val dWs = new scala.collection.mutable.HashMap[(Int,Int),Matrix[Double]]()
-  (0 until layers.length-1).map(l =>{
-    dWs += (l,l+1) -> Ws((l,l+1)).clone().zeros
-  })
-
   def setMask(nlayer0:Int, scentil:Matrix[Double])={
     masks((nlayer0,nlayer0+1)).copyFrom(scentil)
   }
+
 
 
 
@@ -80,9 +73,6 @@ abstract class Network(nnData:NetworkData)
   }
   def solve(maxIter:Int):Double={
 
-    //TODO: continue here
-
-    var lr = 0.2
 
     var counter = 0
 
@@ -94,11 +84,9 @@ abstract class Network(nnData:NetworkData)
         learn(sample)
       }
 
-      (0 until Ws.size).foreach(i =>{
-        Ws((i,i+1)) = Ws((i,i+1)) - lr * dWs((i,i+1))
-        println(Ws((i,i+1)))
-        println("--------------------------")
-    })
+      savedW
+      updateWeights
+
       var error1 = computeError
 
 

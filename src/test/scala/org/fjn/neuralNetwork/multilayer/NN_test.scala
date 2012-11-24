@@ -21,12 +21,20 @@ class NN_test extends  Specification {
 
 
     val ndata = NetworkData(
-                  layerDimensions = List(2,2,2,1),
+                  layerDimensions = List(2,2,4,1),
                   activationFunction= new Sigmoidea(),
                   samplesFilename=NNTestUtils.generateSet1()
     )
 
     val nn2 = new Network(ndata) with BackPropagation
+
+
+    nn2.setMask(2,new Matrix[Double](5,1) <=
+      "1;" +
+      "1;" +
+      "1;" +
+      "1;" +
+      "1")
     val err = nn2.solve(1000)
     println("total Err"+err.toString)
      //val nn = new FeedForwardNN(List(2,5,5,1))

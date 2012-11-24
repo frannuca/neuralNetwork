@@ -29,6 +29,7 @@ object Dependencies {
 
   val matrixdep = "org.fjn" % "matrix_2.9.2" % "1.0.0"
 
+  val optimization = "org.fjn" % "optimization_2.9.2" % "1.0.0"
 
   val specs =  "org.specs2" %% "specs2" % "1.12.2" % "test"
 }
@@ -44,7 +45,7 @@ object ProjectBuild extends Build {
   lazy val neuralProject = Project (
     "neuralNetwork",
     file ("."),
-    settings = buildSettings++ Seq (resolvers :=  Seq(), libraryDependencies ++=Seq(logger,matrixdep,specs))
+    settings = buildSettings++ Seq (resolvers :=  Seq(), libraryDependencies ++=Seq(logger,matrixdep,specs,optimization))
 
   ) //aggregate (optimizer,ia, fjn.fjn.fjn.pythia.pricers)
 
