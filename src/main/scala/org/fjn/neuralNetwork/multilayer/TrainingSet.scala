@@ -1,9 +1,10 @@
 package org.fjn.neuralNetwork.multilayer
 
 import org.fjn.matrix.Matrix
+import org.fjn.neuralNetwork.reader.{TrainingData, DataReader}
 
 
-case class TrainingData(input:Matrix[Double],output:Matrix[Double])
+
 
 
 /**
@@ -16,10 +17,10 @@ case class TrainingData(input:Matrix[Double],output:Matrix[Double])
  *
  * @param fileName file containing input data
  */
-class TrainingSet(fileName:String) extends  Iterable[TrainingData] {
+class TrainingSet(val fileName:String) extends  Iterable[TrainingData] with DataReader{
 
 
-  val data: Array[TrainingData] = readSamples.toArray
+  val data: Array[TrainingData] = getData
 
   private var startPos:Int = 0
 
@@ -45,19 +46,7 @@ class TrainingSet(fileName:String) extends  Iterable[TrainingData] {
     this
   }
 
-   private def readSamples:Seq[TrainingData]={
 
-     (for( line <- scala.io.Source.fromFile(fileName).getLines())
-       yield{
-       val ioData = line.split(";")
-       val input = ioData(0).split(",")
-       val out = ioData(1).split(",")
-
-
-       TrainingData( new Matrix[Double](input.length,1) <= input.map(t => t.toDouble),
-         new Matrix[Double](out.length,1) <= out.map(t => t.toDouble))
-     }).toSeq
-   }
 
 
   def iterator = new Iterator[TrainingData]{

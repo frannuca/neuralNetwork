@@ -2,6 +2,7 @@ package org.fjn.neuralNetwork.multilayer
 
 import org.fjn.matrix.Matrix
 import org.fjn.neuralNetwork.common.NNMatrixExtensions
+import org.fjn.neuralNetwork.reader.TrainingData
 
 
 trait LearningAlgorithm extends NNMatrixExtensions with OptimizationCtes{

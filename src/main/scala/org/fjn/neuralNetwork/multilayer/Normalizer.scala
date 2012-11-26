@@ -2,6 +2,7 @@ package org.fjn.neuralNetwork.multilayer
 
 import org.fjn.matrix.Matrix
 import collection.immutable.IndexedSeq
+import org.fjn.neuralNetwork.reader.TrainingData
 
 class Normalizer(originalTrainingSet: TrainingSet,triggerMaxY:Double,triggerMinY:Double,triggerMaxX:Double,triggerMinX:Double){
 
