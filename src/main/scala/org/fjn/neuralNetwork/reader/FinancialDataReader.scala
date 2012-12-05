@@ -1,13 +1,14 @@
 package org.fjn.neuralNetwork.reader
 
 import java.io.{FileWriter, InputStreamReader, StringReader}
-import sun.reflect.generics.reflectiveObjects.NotImplementedException
+import org.fjn.matrix.Matrix
 
 trait FinancialDataReader extends DataReader{
 
   val nT:Int /// time slice used to built up the different time vectors
   val outputIndex:Int ///given the parameters the output is just one of the futures inputs delayed by some time
   val outputDelay:Int
+
 
   override def getData:Array[TrainingData]={
 
@@ -18,7 +19,8 @@ trait FinancialDataReader extends DataReader{
 
       //number of paramaters if given by the number of rows on the input vector
       val nParameter = samples.head.input.numberRows
-      val timeSeriesFileName = fileName+".finance"
+
+      val timeSeriesFileName = fileName.substring(0,fileName.indexOf("."))+"_nt"++nT.toString+"_dt"+outputDelay +".finance"
 
       Closeable.using(new FileWriter(timeSeriesFileName,false)){
         writer =>{

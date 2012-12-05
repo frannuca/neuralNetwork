@@ -9,8 +9,8 @@ package org.fjn.neuralNetwork.multilayer
  */
 trait OptimizationCtes {
 
-  protected var lr:Double = 0.4
-  protected var momentum:Double = 0.1
+  protected var lr:Double = 0.01
+  protected var momentum:Double = 0.000
 
 
 }

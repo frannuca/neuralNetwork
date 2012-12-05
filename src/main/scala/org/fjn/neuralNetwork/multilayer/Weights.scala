@@ -77,8 +77,6 @@ trait Weights {
     applyMasks
     (0 until Ws.size).foreach(i =>{
       Ws((i,i+1)) = Ws((i,i+1)) - self.lr * dWs((i,i+1)) + momentum * dWsOld((i,i+1))
-      println(Ws((i,i+1)))
-      println("--------------------------")
     })
   }
   def setWeightArray(x:Seq[Double])={

@@ -91,14 +91,16 @@ abstract class Network(nnData:NetworkData)
 
 
       if (error1>error0){
-        lr = lr *0.85
-        if (lr<0.01) lr = 0.01
+        lr = lr *0.5
+        println("lr="+lr.toString)
+        if (lr<1e-6) lr = 1e-6
         undoBackUp
       }
       else{
           backUp
         if (counter > 10){
-          lr= lr * 1.05
+          lr= lr * 1.1
+          println("lr="+lr.toString)
           counter = 0
         }
 
@@ -106,6 +108,7 @@ abstract class Network(nnData:NetworkData)
 
         error0 = error1
 
+        println(error0)
       }
 
 
