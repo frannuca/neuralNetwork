@@ -1,6 +1,7 @@
 package org.fjn.neuralNetwork.multilayer
 
 import activation.ActivationFunction
+import normalization.NormalizerBase
 import org.fjn.neuralNetwork.common.NNMatrixExtensions
 import collection.mutable.ListBuffer
 import org.fjn.matrix.Matrix
@@ -17,33 +18,10 @@ abstract class Network(nnData:NetworkData)
   with LearningAlgorithm
   with Weights{
 
+  val normalizer:NormalizerBase
   import nnData._
 
 
-
-
-  lazy protected val trainingSet:TrainingSet= new TrainingSet(samplesFilename)
-
-
-  lazy val Ymax = nnData.activationFunction.trigger(100)
-  val Ymin = nnData.activationFunction.trigger(-100)
-  lazy val Xmax: Double =  (0 until 1000).map(i => {
-    if(nnData.activationFunction.trigger(i.toDouble/100.0) > Ymax*0.87)
-      Some(i/100.0)
-    else None
-  }
-    ).toSeq.flatten.head
-
-  lazy val Xmin = -Xmax
-  lazy val normalizer =  new Normalizer(
-                        originalTrainingSet=trainingSet,
-                        triggerMaxY = Ymax,
-                        triggerMinY  = Ymin,
-                        triggerMaxX = Xmax,
-                        triggerMinX = Xmin
-                        )
-
-  lazy protected val normTrainingSet = normalizer.normalizedTrainingSet
 
   lazy protected val layers: Seq[Layer] = for (n <- 0 until layerDimensions.length) yield {new Layer(layerDimensions(n),activationFunction)}
 
@@ -63,7 +41,7 @@ abstract class Network(nnData:NetworkData)
 
 
   def computeError:Double={
-    val e = (for (sample <- normTrainingSet)yield{
+    val e = (for (sample <- normalizer.normalizedTrainingSet)yield{
       val o = forward(sample.input)
       val d = (o -sample.output)
       math.sqrt((d * d.transpose)(0,0))
@@ -80,7 +58,7 @@ abstract class Network(nnData:NetworkData)
 
       var error0 = computeError
       dWs.foreach(m => m._2 <= (x => 0.0))
-      for (sample <- normTrainingSet){
+      for (sample <- normalizer.normalizedTrainingSet){
         learn(sample)
       }
 

@@ -1,7 +1,8 @@
 package org.fjn.neuralNetwork.reader
 
 import org.fjn.matrix.Matrix
-
+import org.fjn.neuralNetwork.multilayer.NetworkData
+import org.fjn.neuralNetwork.multilayer.normalization.{Normalizer, NormalizerBase}
 
 
 object DataReader{
@@ -48,16 +49,18 @@ object DataReader{
 }
 trait DataReader {
 
-  val fileName:String
+  outer:DataReader =>
+  val nnData:NetworkData
 
-  def getData:Array[TrainingData]={
-    readSamples(fileName).toArray
+  def getData:(Iterable[TrainingData],Normalizer)={
+    (readSamples(nnData.samplesFilename),new Normalizer {
+      val nnData =   outer.nnData
+    })
   }
 
 
 
   protected def readSamples(filename:String):Seq[TrainingData]={
-
-   DataReader.readSamples(fileName)
+   DataReader.readSamples(filename)
   }
 }

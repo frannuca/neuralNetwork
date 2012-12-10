@@ -20,7 +20,7 @@ import org.fjn.neuralNetwork.reader.{TrainingData, DataReader}
 class TrainingSet(val fileName:String) extends  Iterable[TrainingData] with DataReader{
 
 
-  val data: Array[TrainingData] = getData
+  val data: Array[TrainingData] = getData._1.toArray
 
   private var startPos:Int = 0
 
