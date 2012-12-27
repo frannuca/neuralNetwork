@@ -1,7 +1,8 @@
 package org.fjn.neuralNetwork.multilayer
 
+import activation.Sigmoidea
 import org.specs2.mutable.Specification
-import org.fjn.neuralNetwork.reader.FinancialDataReader
+import org.fjn.neuralNetwork.reader.{TrainingData, FinancialDataReader}
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,16 +17,15 @@ class SamplesReaderTest  extends  Specification {
   "training a NN" should {
     "run" in {
 
-      val reader = new FinancialDataReader {
-        val outputDelay = 1
-        val outputIndex = 0
-        val nT = 5
-        val fileName = "C:\\Users\\fran\\Downloads\\IBEX35.txt"
-      }
+      val samples: Seq[TrainingData] = FinancialDataReader(
+        fileName = "C:\\Users\\fran\\Downloads\\IBEX35.txt",
+        triggerFunc = new Sigmoidea().trigger,
+        outputDelay = 1,
+        outputIndex = 0 ,
+        nT = 5       )
 
 
-
-      val data = reader.getData
+       val a = 0
 
     }
   }

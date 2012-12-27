@@ -4,7 +4,7 @@ import org.specs2.mutable.Specification
 import java.io.FileOutputStream
 import activation.{Sigmoidea, ActivationFunction}
 import org.fjn.matrix.Matrix
-import org.fjn.neuralNetwork.reader.MaskFactory
+import org.fjn.neuralNetwork.reader.{TrainingData, FinancialDataReader, MaskFactory}
 
 
 class NN_test extends  Specification {
@@ -20,14 +20,16 @@ class NN_test extends  Specification {
 
 
 
+    val nn2 =  new FeedForwardNetwork(
+      new NetworkData(layerDimensions = Seq(30,6,25,25,1), activationFunction= new Sigmoidea(),
+        dataSet = FinancialDataReader(
+          fileName = "C:\\Users\\fran\\Downloads\\IBEX35_2010.txt",
+          triggerFunc = new Sigmoidea().trigger,
+          nT = 5,
+          outputIndex=0,
+          outputDelay=1
+        ))     )
 
-    val ndata = NetworkData(
-                  layerDimensions = List(30,6,500,1),
-                  activationFunction= new Sigmoidea(),
-                  samplesFilename="C:\\Users\\fran\\Downloads\\IBEX35_nt5_dt1.finance"//NNTestUtils.generateSet1()
-    )
-
-    val nn2 = new Network(ndata) with BackPropagation
 
 
     val mask1 = MaskFactory.getMask(nParam=6,nT=5,true)

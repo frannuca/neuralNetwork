@@ -4,26 +4,19 @@ import activation.ActivationFunction
 import org.fjn.matrix.Matrix
 import collection.immutable.IndexedSeq
 
-/**
- * Created with IntelliJ IDEA.
- * User: fran
- * Date: 18/11/12
- * Time: 18:10
- * To change this template use File | Settings | File Templates.
- */
 class Layer(dim:Int,activationFunc:ActivationFunction){
-
 
   def size = dim
   val cells: IndexedSeq[Cell] = (0 until dim).map(i => new Cell(activationFunc))
+
   def apply(x:Matrix[Double],isInput:Boolean=false):Matrix[Double]={
     require(x.numberRows == cells.length && x.numberCols == 1)
 
 
     if (!isInput)
-      new Matrix[Double](cells.length,1) <= (0 until cells.length).map(i => cells(i)(x(i,0)).out)
+      new Matrix[Double](cells.length,1) <= cells.indices.map(i => cells(i)(x(i,0)).out)
     else
-      new Matrix[Double](cells.length,1) <= (0 until cells.length).map(i =>{cells(i).cellOutput = CellStimulus( x(i,0),0); x(i,0)})
+      new Matrix[Double](cells.length,1) <= cells.indices.map(i =>{cells(i).cellOutput = CellData( x(i,0),0); x(i,0)})
 
 
   }

@@ -2,7 +2,7 @@ package org.fjn.neuralNetwork.reader
 
 import org.fjn.matrix.Matrix
 import org.fjn.neuralNetwork.multilayer.NetworkData
-import org.fjn.neuralNetwork.multilayer.normalization.{Normalizer, NormalizerBase}
+import org.fjn.neuralNetwork.multilayer.normalization.{MeanNormalizer, Normalizer}
 
 
 object DataReader{
@@ -13,10 +13,10 @@ object DataReader{
       s.toDouble
     }
     catch{
-      case _ => -1.0
+      case _ => Double.NaN
     }
   }
-  def readSamples(fileName:String):Array[TrainingData]={
+  def readSamples(fileName:String,skip:Int=0):Array[TrainingData]={
 
     val r = Closeable.using(scala.io.Source.fromFile(fileName)){
       reader =>{
@@ -24,8 +24,8 @@ object DataReader{
         yield{
           val (input,out): (Array[String], Array[String]) =
             line.split(";") match{
-              case Array(ni,out) => (ni.split(","),out.split(","))
-              case Array(ni)=> (ni.split(","),Array("-1"))
+              case Array(ni,out) => (ni.split(",").slice(skip,ni.length),out.split(","))
+              case Array(ni)=> (ni.split(",").slice(skip,ni.length),Array("-1"))
               case _=> throw new Exception("Invalid input format")
             }
 
@@ -34,7 +34,8 @@ object DataReader{
           val bb = out
 
 
-          val mIn = new Matrix[Double](input.length,1) <= input.map(convertString2Double _)
+          val filteredInput = input.map(convertString2Double _).filter(v => !v.isNaN)
+          val mIn = new Matrix[Double](filteredInput.length,1) <=   filteredInput
           val mOut = new Matrix[Double](out.length,1) <= out.map(t => t.toDouble)
 
           TrainingData(mIn,mOut)
@@ -45,22 +46,5 @@ object DataReader{
 
     }
     r.toArray
-  }
-}
-trait DataReader {
-
-  outer:DataReader =>
-  val nnData:NetworkData
-
-  def getData:(Iterable[TrainingData],Normalizer)={
-    (readSamples(nnData.samplesFilename),new Normalizer {
-      val nnData =   outer.nnData
-    })
-  }
-
-
-
-  protected def readSamples(filename:String):Seq[TrainingData]={
-   DataReader.readSamples(filename)
   }
 }

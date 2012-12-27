@@ -3,13 +3,13 @@ package org.fjn.neuralNetwork.multilayer
 import activation.ActivationFunction
 
 
-case class CellStimulus(out:Double,diffOut:Double)
+case class CellData(out:Double,diffOut:Double)
 
 class Cell(activation:ActivationFunction) {
-  var cellOutput =  CellStimulus(0d,0d)
+  var cellOutput =  CellData(0d,0d)
 
-  def apply(x:Double):CellStimulus={
-    cellOutput = CellStimulus(activation.trigger(x),activation.diffTrigger(x))
+  def apply(x:Double):CellData={
+    cellOutput = CellData(activation.trigger(x),activation.diffTrigger(x))
     cellOutput
   }
 
