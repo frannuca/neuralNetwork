@@ -17,12 +17,12 @@ class SamplesReaderTest  extends  Specification {
   "training a NN" should {
     "run" in {
 
-      val samples: Seq[TrainingData] = FinancialDataReader(
+      val samples: Seq[TrainingData] = new FinancialDataReader(
         fileName = "C:\\Users\\fran\\Downloads\\IBEX35.txt",
         triggerFunc = new Sigmoidea().trigger,
         outputDelay = 1,
         outputIndex = 0 ,
-        nT = 5       )
+        nT = 5       ).normalizedSamples
 
 
        val a = 0

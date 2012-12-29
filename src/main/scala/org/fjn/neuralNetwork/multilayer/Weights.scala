@@ -3,23 +3,24 @@ package org.fjn.neuralNetwork.multilayer
 import org.fjn.matrix.Matrix
 import collection.mutable
 import org.fjn.matrix.Scalar2MatrixConversions._
+import java.io.{FileReader, FileWriter, BufferedWriter, File}
+import org.fjn.neuralNetwork.reader.Closeable
 
-trait Weights {
+trait Weights extends Serializable{
   self:Network =>
 
   def generateLayerIndices = 0 until layers.length-1
-
 
   def randomizeWeigths{
     val rngen = new scala.util.Random()
 
     Ws.foreach(item => item match{
-      case ((l1,l2),w)=> w.getArray().indices.foreach(i=> w.getArray()(i)= w.getArray()(i)*(1.0+(rngen.nextDouble()-0.5)*0.1))
+      case ((l1,l2),w)=> w.getArray().indices.foreach(i=> w.getArray()(i)= w.getArray()(i)*(1.0+(rngen.nextDouble()-0.5)*0.5))
     })
   }
   lazy val Ws = new scala.collection.mutable.HashMap[(Int,Int),Matrix[Double]]()
   generateLayerIndices.map(l =>{
-    Ws += (l,l+1) -> new Matrix[Double](layers(l).size+1,layers(l+1).size).random
+    Ws += (l,l+1) -> (new Matrix[Double](layers(l).size+1,layers(l+1).size).random-0.5)*( if(l==0) 1 else 1)
   })
 
   lazy val masks = new scala.collection.mutable.HashMap[(Int,Int),Matrix[Double]]()
@@ -87,7 +88,7 @@ trait Weights {
   def addtoHistory={
     dWsHistory
     (0 until dWsHistory.size).foreach(i =>{
-      dWsHistory((i,i+1)) = self.lr *(dWsHistory((i,i+1)) +  dWs((i,i+1)))
+      dWsHistory((i,i+1)) =  momentum *(dWsHistory((i,i+1)) +   self.lr * dWs((i,i+1)))
     })
   }
 
@@ -95,7 +96,7 @@ trait Weights {
     applyMasks
     addtoHistory
     (0 until Ws.size).foreach(i =>{
-      Ws((i,i+1)) = Ws((i,i+1)) - self.lr * dWs((i,i+1)) - momentum *  dWsHistory((i,i+1))
+      Ws((i,i+1)) = Ws((i,i+1)) - self.lr * dWs((i,i+1)) -  dWsHistory((i,i+1))
     })
   }
   def setWeightArray(x:Seq[Double])={

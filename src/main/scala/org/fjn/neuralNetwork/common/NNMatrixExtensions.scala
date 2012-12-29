@@ -3,7 +3,7 @@ package org.fjn.neuralNetwork.common
 import org.fjn.matrix.Matrix
 
 
-trait NNMatrixExtensions {
+trait NNMatrixExtensions extends Serializable{
   def setOnes(m: Matrix[Double]): Unit = {
     for (i <- 0 until m.numberCols) {
       m.set(m.numberRows - 1, i, 1.0)

@@ -1,7 +1,7 @@
 package org.fjn.neuralNetwork.multilayer
 
 import org.specs2.mutable.Specification
-import java.io.FileOutputStream
+import java.io.{FileInputStream, ObjectInputStream, ObjectOutputStream, FileOutputStream}
 import activation.{Sigmoidea, ActivationFunction}
 import org.fjn.matrix.Matrix
 import org.fjn.neuralNetwork.reader.{TrainingData, FinancialDataReader, MaskFactory}
@@ -11,7 +11,8 @@ class NN_test extends  Specification {
 
   "training a NN" should {
     "run" in {
-      `testAlgorithm` mustEqual true
+      //`testAlgorithm` mustEqual true
+      testDeSerializer mustEqual true
 
     }
   }
@@ -20,25 +21,42 @@ class NN_test extends  Specification {
 
 
 
+    val normalizer =  new FinancialDataReader(
+      fileName = "C:\\Users\\fran\\Downloads\\IBEX35_2011.txt",
+      triggerFunc = new Sigmoidea().trigger,
+      nT = 15,
+      outputIndex=0,
+      outputDelay=1
+    )
+    val data = normalizer.normalizedSamples
+
     val nn2 =  new FeedForwardNetwork(
-      new NetworkData(layerDimensions = Seq(30,6,25,25,1), activationFunction= new Sigmoidea(),
-        dataSet = FinancialDataReader(
-          fileName = "C:\\Users\\fran\\Downloads\\IBEX35_2010.txt",
-          triggerFunc = new Sigmoidea().trigger,
-          nT = 5,
-          outputIndex=0,
-          outputDelay=1
-        ))     )
+      new NetworkData(layerDimensions = Seq(data.head.input.numberRows,6,50,50,1), activationFunction= new Sigmoidea(),
+        dataSet = data),lr0 = 0.01,momentum0=0.8 )
 
-
-
-    val mask1 = MaskFactory.getMask(nParam=6,nT=5,true)
+    val mask1 = MaskFactory.getMask(nParam=6,nT=15,true)
 
     nn2.setMask(0,mask1)
-    val err = nn2.solve(1000)
+    val err = nn2.solve(500)
+
+    val output = new ObjectOutputStream(new FileOutputStream("C:\\temp\\test.obj"))
+    output.writeObject(nn2)
+    output.close()
+
+    val input = new ObjectInputStream(new FileInputStream("C:\\temp\\test.obj"))
+    val obj = input.readObject()
+    input.close()
+    val m2 = obj.asInstanceOf[FeedForwardNetwork]
+
+
     println("total Err"+err.toString)
      //val nn = new FeedForwardNN(List(2,5,5,1))
 
+    val t1 = nn2.nnData.dataSet.head.input
+    val o1 = nn2.nnData.dataSet.head.output
+    val b1 = nn2(t1)
+    val bn = normalizer.normalizer.deNormaliseY(b1)
+    println("res = "+bn.toString)
 
 
     val sbld = new StringBuilder()
@@ -65,6 +83,37 @@ class NN_test extends  Specification {
 
   }
 
+  def testDeSerializer={
+
+    val input = new ObjectInputStream(new FileInputStream("C:\\temp\\test.obj"))
+    val obj = input.readObject()
+    input.close()
+    val m2 = obj.asInstanceOf[FeedForwardNetwork]
+
+    val normalizer =  new FinancialDataReader(
+      fileName = "C:\\Users\\fran\\Downloads\\IBEX35_2011.txt",
+      triggerFunc = new Sigmoidea().trigger,
+      nT = 15,
+      outputIndex=0,
+      outputDelay=1
+    )
+    val data = normalizer.normalizedSamples
+
+    def dx = normalizer.normalizer.deNormaliseX _
+    def dy = normalizer.normalizer.deNormaliseY _
+
+    val inPar = normalizer.normalizer.deNormaliseX(normalizer.normalizedSamples.head.input)
+    val outPar = normalizer.normalizer.deNormaliseX(normalizer.normalizedSamples.head.output)
+    val nnout = m2(normalizer.normalizedSamples.head.input)
+
+    println("error="+m2.computeError.toString)
+    println("input vector="+inPar.toString)
+
+    println("output vector="+outPar.toString)
+    println("NN output vector="+dy(nnout).toString)
+
+    true
+  }
 }
 
 object NNTestUtils{

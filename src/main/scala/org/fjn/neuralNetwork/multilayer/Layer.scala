@@ -4,7 +4,7 @@ import activation.ActivationFunction
 import org.fjn.matrix.Matrix
 import collection.immutable.IndexedSeq
 
-class Layer(dim:Int,activationFunc:ActivationFunction){
+class Layer(dim:Int,activationFunc:ActivationFunction) extends Serializable{
 
   def size = dim
   val cells: IndexedSeq[Cell] = (0 until dim).map(i => new Cell(activationFunc))

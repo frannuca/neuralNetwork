@@ -5,7 +5,7 @@ import org.fjn.neuralNetwork.common.NNMatrixExtensions
 import org.fjn.neuralNetwork.reader.TrainingData
 
 
-trait LearningAlgorithm extends NNMatrixExtensions with OptimizationCtes{
+trait LearningAlgorithm extends Serializable with NNMatrixExtensions with OptimizationCtes{
    self: Network =>
   def learn(sample:TrainingData)
 

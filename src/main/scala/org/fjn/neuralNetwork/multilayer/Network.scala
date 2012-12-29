@@ -15,10 +15,10 @@ import org.fjn.neuralNetwork.reader.{TrainingData, DataReader}
 case class NetworkData(layerDimensions:Seq[Int],activationFunction:ActivationFunction,dataSet:Seq[TrainingData])
 
 trait Network
-  extends NNMatrixExtensions
+  extends Serializable
+  with NNMatrixExtensions
   with LearningAlgorithm
   with Weights{
-
 
   val nnData:NetworkData
   lazy protected val layers: Seq[Layer] = nnData.layerDimensions.map(dim =>  new Layer(dim,nnData.activationFunction))
@@ -41,11 +41,20 @@ trait Network
     e
   }
 
+
   def solve(maxIter:Int):Double={
 
+
+    lr = lr0
+    momentum= momentum0
     var counter = 0
+    var minError = computeError
+    backUp
+
 
     for (iteration <- 0 until maxIter){
+
+
 
       var error0 = computeError
       dWs.foreach(_._2.zeros)
@@ -53,31 +62,36 @@ trait Network
       println("iteration"+iteration.toString)
       nnData.dataSet.foreach(learn)
 
-
-      savedW
       updateWeights
+      savedW
       var error1 = computeError
       println("error0="+error0.toString)
       println("error1="+error1.toString)
 
 
-      if (error1>error0){
-        lr = lr *0.5
+      if (error1>=error0){
+
         println("lr="+lr.toString)
-        undoBackUp
-        if (lr<1e-6){
+
+        if (counter > 0){
+          lr = lr *0.5
+
+          undoBackUp
+          val a= dWsHistory
           println("*****************************Randomizing Weights")
           randomizeWeigths
           counter = 0
-          lr = 0.01
         }
+
       }
       else{
 
         println("*****************************GOOD!!!!")
+        if (error1<minError)
           backUp
+
         if (counter > 10){
-          lr= lr * 1.05
+          lr= lr * 1.25
           counter = 0
         }
         println("lr="+lr.toString)
@@ -93,7 +107,7 @@ trait Network
 
   }
 
-
+    undoBackUp
     computeError
 
   }

@@ -7,10 +7,12 @@ package org.fjn.neuralNetwork.multilayer
  * Time: 10:10
  * To change this template use File | Settings | File Templates.
  */
-trait OptimizationCtes {
+trait OptimizationCtes extends Serializable{
 
-  protected var lr:Double = 0.5
-  protected var momentum:Double = 0.000
+  val lr0:Double
+  val momentum0:Double
+  protected var lr:Double = 0.1
+  protected var momentum:Double = 0.5
 
 
 }
