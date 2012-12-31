@@ -4,10 +4,24 @@ import java.io.{FileWriter, InputStreamReader, StringReader}
 import org.fjn.matrix.Matrix
 import org.fjn.neuralNetwork.multilayer.normalization.{Normalizer, MeanNormalizer}
 import org.fjn.neuralNetwork.multilayer.NetworkData
+import collection.immutable.IndexedSeq
 
-class FinancialDataReader(fileName: String, triggerFunc: Function1[Double, Double], nT: Int, outputIndex: Int, outputDelay: Int) {
+case class FinancialDataReader(fileName: String, triggerFunc: Function1[Double, Double], nT: Int, outputIndex: Seq[Int], outputDelay: Int,nAverage:Int=5) {
 
-  val samples = DataReader.readSamples(fileName)
+
+  private def movingAverage(data:Array[TrainingData],nSamples:Int):Seq[TrainingData]={
+    val zeroInput = data.head.input.clone().zeros
+    val zeroOut = data.head.output.clone().zeros
+    val zeroTraining = new TrainingData(zeroInput,zeroOut)
+
+    for (i<- data.indices.drop(nSamples))yield{
+      val a = data.slice(i-nSamples,i).foldLeft(zeroTraining)((b,td)=> new TrainingData((td.input+b.input),(td.output+b.output)))
+      new TrainingData(input= a.input/nSamples.toDouble,output=a.output/nSamples.toDouble)
+
+    }
+  }
+  val samples = movingAverage(DataReader.readSamples(fileName),nAverage)
+
   val timeSeriesFileName = fileName.substring(0, fileName.indexOf(".")) + "_nt" ++ nT.toString + "_dt" + outputDelay + ".finance"
 
 
@@ -35,7 +49,14 @@ class FinancialDataReader(fileName: String, triggerFunc: Function1[Double, Doubl
 
         }
 
-        writer.write(samples(i + nT - 1 + outputDelay).input(outputIndex, 0).toString() + "\r\n")
+
+          val outs: Matrix[Double] = samples(i + nT - 1 + outputDelay).input.sub(outputIndex, Seq(0))
+          outs.getArray().indices.foreach(i =>{
+              writer.write(outs.getArray()(i).toString)
+              if(i<outputIndex.length-1) writer.write(",")
+              })
+
+        writer.write("\r\n")
 
       }
 

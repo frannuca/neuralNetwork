@@ -5,48 +5,72 @@ import java.io.{FileInputStream, ObjectInputStream, ObjectOutputStream, FileOutp
 import activation.{Sigmoidea, ActivationFunction}
 import org.fjn.matrix.Matrix
 import org.fjn.neuralNetwork.reader.{TrainingData, FinancialDataReader, MaskFactory}
+import javax.swing.JFrame
 
 
 class NN_test extends  Specification {
 
   "training a NN" should {
     "run" in {
-      //`testAlgorithm` mustEqual true
+//     `testAlgorithm` mustEqual true
+//      refineAlgorithm mustEqual true
       testDeSerializer mustEqual true
+//      extrapolationTest mustEqual true
 
     }
   }
 
-  def `testAlgorithm`={
+  val normalizer =  new FinancialDataReader(
+    fileName = "C:\\Users\\fran\\Downloads\\IBEX35_2012.csv",
+    triggerFunc = new Sigmoidea().trigger,
+    nT = 5,
+    outputIndex=Seq(0),
+    outputDelay=5,
+    nAverage = 3
+  )
 
+  def refineAlgorithm={
+    val input = new ObjectInputStream(new FileInputStream("C:\\temp\\test.obj"))
+    val obj = input.readObject()
+    input.close()
+    val nn2 = obj.asInstanceOf[FeedForwardNetwork]
 
-
-    val normalizer =  new FinancialDataReader(
-      fileName = "C:\\Users\\fran\\Downloads\\IBEX35_2011.txt",
-      triggerFunc = new Sigmoidea().trigger,
-      nT = 15,
-      outputIndex=0,
-      outputDelay=1
-    )
     val data = normalizer.normalizedSamples
 
-    val nn2 =  new FeedForwardNetwork(
-      new NetworkData(layerDimensions = Seq(data.head.input.numberRows,6,50,50,1), activationFunction= new Sigmoidea(),
-        dataSet = data),lr0 = 0.01,momentum0=0.8 )
-
-    val mask1 = MaskFactory.getMask(nParam=6,nT=15,true)
+    val mask1 = MaskFactory.getMask(nParam=4,nT=normalizer.nT,true)
 
     nn2.setMask(0,mask1)
-    val err = nn2.solve(500)
+    val err = nn2.solve(100)
+
 
     val output = new ObjectOutputStream(new FileOutputStream("C:\\temp\\test.obj"))
     output.writeObject(nn2)
     output.close()
 
-    val input = new ObjectInputStream(new FileInputStream("C:\\temp\\test.obj"))
-    val obj = input.readObject()
-    input.close()
-    val m2 = obj.asInstanceOf[FeedForwardNetwork]
+    val t1 = nn2.nnData.dataSet.head.input
+    val o1 = nn2.nnData.dataSet.head.output
+    val b1 = nn2(t1)
+    val bn = normalizer.normalizer.deNormaliseY(b1)
+    println("res = "+bn.toString)
+
+    true
+  }
+  def `testAlgorithm`={
+
+    val data = normalizer.normalizedSamples
+
+    val nn2 =  new FeedForwardNetwork(
+      new NetworkData(layerDimensions = Seq(data.head.input.numberRows,4,50,1), activationFunction= new Sigmoidea(),
+        dataSet = data),lr0 = 0.01,momentum0=0.8 )
+
+    val mask1 = MaskFactory.getMask(nParam=4,nT=normalizer.nT,true)
+
+    nn2.setMask(0,mask1)
+    val err = nn2.solve(100)
+
+    val output = new ObjectOutputStream(new FileOutputStream("C:\\temp\\test.obj"))
+    output.writeObject(nn2)
+    output.close()
 
 
     println("total Err"+err.toString)
@@ -59,30 +83,38 @@ class NN_test extends  Specification {
     println("res = "+bn.toString)
 
 
-    val sbld = new StringBuilder()
-    sbld.append(0).append(",").append(0).append(";").append(1).append(";").append(nn2(new Matrix[Double](2,1) <= Seq(0.0,0.0))).append("\r\n")
-    sbld.append(0).append(",").append(1).append(";").append(0).append(";").append(nn2(new Matrix[Double](2,1) <= Seq(0.0,1.0))).append("\r\n")
-    sbld.append(1).append(",").append(0).append(";").append(0).append(";").append(nn2(new Matrix[Double](2,1) <= Seq(1.0,0.0))).append("\r\n")
-    sbld.append(1).append(",").append(1).append(";").append(1).append(";").append(nn2(new Matrix[Double](2,1) <= Seq(1.0,1.0))).append("\r\n")
-
-    println(sbld.toString())
-
-    //val err = nn.train(NNTestUtils.generateSet1(),true)
-
-
-    val e1 = nn2.computeError
-    val a1 = nn2.getWeightArray
-
-    a1(3)=a1(3)*0.5
-    nn2.setWeightArray(a1)
-
-    val e2 = nn2.computeError
-
-    err/4.0 < 0.1
+ //err/4.0 < 0.1
+    true
 
 
   }
 
+  def extrapolationTest={
+
+    val input = new ObjectInputStream(new FileInputStream("C:\\temp\\test.obj"))
+    val obj = input.readObject()
+    input.close()
+    val m2 = obj.asInstanceOf[FeedForwardNetwork]
+
+    val x = TimeExtrapolator.extrapolation(normalizer.normalizedSamples.last.input,15,m2,normalizer.nT).map(normalizer.normalizer.deNormaliseY _)
+
+    import org.math.plot._
+    // create your PlotPanel (you can use it as a JPanel)
+    val plot = new Plot2DPanel();
+
+    // add a line plot to the PlotPanel
+
+    plot.addLinePlot("real IBEX 35", (0 until x.length).map(s => s.asInstanceOf[Double]).toArray,x.map(s => s(0,0)).toArray)
+
+    // put the PlotPanel in a JFrame, as a JPanel
+    val frame = new JFrame("a plot panel");
+    frame.setContentPane(plot);
+    frame.setVisible(true);
+
+    val ln = readLine()
+    true
+
+  }
   def testDeSerializer={
 
     val input = new ObjectInputStream(new FileInputStream("C:\\temp\\test.obj"))
@@ -90,27 +122,35 @@ class NN_test extends  Specification {
     input.close()
     val m2 = obj.asInstanceOf[FeedForwardNetwork]
 
-    val normalizer =  new FinancialDataReader(
-      fileName = "C:\\Users\\fran\\Downloads\\IBEX35_2011.txt",
-      triggerFunc = new Sigmoidea().trigger,
-      nT = 15,
-      outputIndex=0,
-      outputDelay=1
-    )
     val data = normalizer.normalizedSamples
 
     def dx = normalizer.normalizer.deNormaliseX _
     def dy = normalizer.normalizer.deNormaliseY _
 
     val inPar = normalizer.normalizer.deNormaliseX(normalizer.normalizedSamples.head.input)
-    val outPar = normalizer.normalizer.deNormaliseX(normalizer.normalizedSamples.head.output)
-    val nnout = m2(normalizer.normalizedSamples.head.input)
+    val outTraining: Array[Double] =
+      (normalizer.normalizedSamples.map(s => normalizer.normalizer.deNormaliseY(s.output)(0,0)).toSeq
+        ).toArray
 
-    println("error="+m2.computeError.toString)
-    println("input vector="+inPar.toString)
+    val nnout: Array[Double] =  normalizer.normalizedSamples.map(s => m2(s.input)).map(dy).map(_(0,0)).toSeq.toArray
 
-    println("output vector="+outPar.toString)
-    println("NN output vector="+dy(nnout).toString)
+    val x = nnout.indices.toArray.map(_.asInstanceOf[Double])
+    val x0 = outTraining.indices.toArray.map(_.asInstanceOf[Double])
+    import org.math.plot._
+    // create your PlotPanel (you can use it as a JPanel)
+    val plot = new Plot2DPanel();
+
+    // add a line plot to the PlotPanel
+    plot.addLinePlot("neural Network", x, nnout.toArray);
+    plot.addLinePlot("real IBEX 35", x0, outTraining.toArray);
+
+    // put the PlotPanel in a JFrame, as a JPanel
+    val frame = new JFrame("a plot panel");
+    frame.setContentPane(plot);
+    frame.setVisible(true);
+
+
+    val ln = readLine()
 
     true
   }

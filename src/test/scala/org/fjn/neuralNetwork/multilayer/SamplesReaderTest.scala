@@ -21,7 +21,7 @@ class SamplesReaderTest  extends  Specification {
         fileName = "C:\\Users\\fran\\Downloads\\IBEX35.txt",
         triggerFunc = new Sigmoidea().trigger,
         outputDelay = 1,
-        outputIndex = 0 ,
+        outputIndex = 0 until 6 ,
         nT = 5       ).normalizedSamples
 
 
