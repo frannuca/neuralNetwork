@@ -27,6 +27,7 @@ trait Network
     masks((nlayer0,nlayer0+1)).copyFrom(scentil)
   }
 
+
   def apply(x:Matrix[Double]):Matrix[Double]={
      forward(x)
   }
@@ -48,6 +49,7 @@ trait Network
     lr = lr0
     momentum= momentum0
     var counter = 0
+    var counterErrors = 0
     var minError = computeError
     backUp
 
@@ -65,33 +67,38 @@ trait Network
       updateWeights
       savedW
       var error1 = computeError
-      println("error0="+error0.toString)
-      println("error1="+error1.toString)
+
 
 
       if (error1>=error0){
 
         println("lr="+lr.toString)
 
-        if (counter > 0){
-          lr = lr *0.5
+        counterErrors = counterErrors + 1
+        if (counterErrors > 15){
+          lr = lr *0.25
 
           undoBackUp
           val a= dWsHistory
           println("*****************************Randomizing Weights")
           randomizeWeigths
-          counter = 0
-        }
+          counterErrors = 0
 
+        }
+        counter = 0
       }
       else{
 
+        counterErrors = 0
         println("*****************************GOOD!!!!")
         if (error1<minError)
+        {
           backUp
+          minError= error1
+        }
 
         if (counter > 10){
-          lr= lr * 1.25
+          lr= lr * 1.5
           counter = 0
         }
         println("lr="+lr.toString)
@@ -104,8 +111,11 @@ trait Network
 
 
 
+      println("error0="+error0.toString)
+      println("error1="+error1.toString)
+      println("errorMin="+minError.toString)
 
-  }
+    }
 
     undoBackUp
     computeError

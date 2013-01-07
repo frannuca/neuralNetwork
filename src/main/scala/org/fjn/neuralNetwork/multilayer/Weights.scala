@@ -15,7 +15,7 @@ trait Weights extends Serializable{
     val rngen = new scala.util.Random()
 
     Ws.foreach(item => item match{
-      case ((l1,l2),w)=> w.getArray().indices.foreach(i=> w.getArray()(i)= w.getArray()(i)*(1.0+(rngen.nextDouble()-0.5)*0.5))
+      case ((l1,l2),w)=> w.getArray().indices.foreach(i=> w.getArray()(i)= w.getArray()(i)*(1.0+(rngen.nextDouble()-0.5)* (if(i==0) 0.01 else 0.1)))
     })
   }
   lazy val Ws = new scala.collection.mutable.HashMap[(Int,Int),Matrix[Double]]()

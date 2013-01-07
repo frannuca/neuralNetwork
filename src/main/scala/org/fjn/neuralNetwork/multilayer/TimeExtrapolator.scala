@@ -10,19 +10,19 @@ object TimeExtrapolator {
   def extrapolation(x0:Matrix[Double],numberOfIterations:Int,neuralNetwork:Network,nT:Int):Seq[Matrix[Double]]={
     var x = x0
 
-    def updateX:Function1[Matrix[Double],Matrix[Double]] =  v =>{
-      (for(i <- 0 until v.numberRows) yield{
-        x.getArray().slice(i*nT,(i+1)*nT-1)++Seq(v(i,0))
-      }).flatten.toArray.copyToArray(x.getArray(),0)
+    def updateX:Function2[Matrix[Double],Matrix[Double],Matrix[Double]] =  (o,y) =>{
+      (for(i <- 0 until o.numberRows) yield{
+        y.getArray().slice(i*nT,(i+1)*nT-1)++Seq(o(i,0))
+      }).flatten.toArray.copyToArray(y.getArray(),0)
 
 
-      x
+      y
 
     }
 
     (0 until  numberOfIterations).map(n =>{
       var o = neuralNetwork(x)
-      updateX(o)
+      updateX(o,x)
       o
     }).toSeq
   }

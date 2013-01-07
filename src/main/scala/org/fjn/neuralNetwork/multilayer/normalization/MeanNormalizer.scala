@@ -13,9 +13,10 @@ class MeanNormalizer(fileName:String,val triggerFunc:Function1[Double,Double]) e
   val triggerMinY:Double = triggerFunc(-100)
 
 
-  private val xVals = (-1000 until 1000).map(i => triggerFunc(i.toDouble/100.0))
-  val triggerMaxX:Double = xVals.filter(d => d>triggerMaxY*0.9).head
-  val triggerMinX:Double = xVals.filter(d => d<triggerMinY*0.9).last
+
+  private val xVals = (-1000 until 1000).map(i => (i.toDouble/100.0,triggerFunc(i.toDouble/100.0)))
+  val triggerMaxX:Double = xVals.filter(d => d._2>triggerMaxY*0.99).head._1
+  val triggerMinX:Double = -triggerMaxX //xVals.filter(d => d<triggerMinY*0.9).last
 
   private val maxMinMeanInput: IndexedSeq[(Double, Double, Double)] = {
     (0 until originalTrainingSet(0).input.numberRows).map(i =>{
@@ -80,14 +81,31 @@ class MeanNormalizer(fileName:String,val triggerFunc:Function1[Double,Double]) e
 
   def deNormaliseY(x:Matrix[Double]):Matrix[Double]={
 
-    def deNorm = (x:Double,index:Int) =>
-      x * (maxMinMeanOutput(index)._1-maxMinMeanOutput(index)._2)/maxDifTriggerY + maxMinMeanOutput(index)._3
 
-    val r = x.clone()
-    x.getArray().indices.foreach{ i=>
-      r.set(i,0,deNorm(x(i,0),i))
+    try {
+      def deNorm = (x:Double,index:Int) =>{
+        val nn = index
+        val a1 = maxMinMeanOutput(index)._1
+        val a2 = maxMinMeanOutput(index)._2
+        val a3 = maxMinMeanOutput(index)._3
+
+        x * (maxMinMeanOutput(index)._1-maxMinMeanOutput(index)._2)/maxDifTriggerY + maxMinMeanOutput(index)._3
+      }
+
+
+      val r = x.clone()
+      x.getArray().indices.foreach{ i=>
+        r.set(i,0,deNorm(x(i,0),i))
+      }
+      r
+    } catch{
+      case e:Throwable=> {
+        val str = e.getMessage
+        println(e.getMessage); throw e
+      }
     }
-    r
+
+
   }
 
 }

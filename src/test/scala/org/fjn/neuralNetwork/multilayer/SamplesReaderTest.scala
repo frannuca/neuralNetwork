@@ -20,7 +20,7 @@ class SamplesReaderTest  extends  Specification {
       val samples: Seq[TrainingData] = new FinancialDataReader(
         fileName = "C:\\Users\\fran\\Downloads\\IBEX35.txt",
         triggerFunc = new Sigmoidea().trigger,
-        outputDelay = 1,
+        outputDelay = Seq(1),
         outputIndex = 0 until 6 ,
         nT = 5       ).normalizedSamples
 
