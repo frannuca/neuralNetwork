@@ -1,7 +1,5 @@
-package org.fjn.neuralNetwork.multilayer
+package org.fjn.neuralNetwork.multilayer.architecture
 
-import activation.ActivationFunction
-import normalization.Normalizer
 import org.fjn.neuralNetwork.common.NNMatrixExtensions
 import collection.mutable.ListBuffer
 import org.fjn.matrix.Matrix
@@ -11,6 +9,8 @@ import org.fjn.matrix.Scalar
 import org.fjn.matrix.Scalar2MatrixConversions._
 import collection.immutable
 import org.fjn.neuralNetwork.reader.{TrainingData, DataReader}
+import org.fjn.neuralNetwork.multilayer.activation.ActivationFunction
+import org.fjn.neuralNetwork.multilayer.algorithm.LearningAlgorithm
 
 case class NetworkData(layerDimensions:Seq[Int],activationFunction:ActivationFunction,dataSet:Seq[TrainingData])
 

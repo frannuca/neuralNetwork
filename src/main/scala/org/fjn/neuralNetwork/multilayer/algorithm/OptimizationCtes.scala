@@ -1,4 +1,4 @@
-package org.fjn.neuralNetwork.multilayer
+package org.fjn.neuralNetwork.multilayer.algorithm
 
 /**
  * Created with IntelliJ IDEA.

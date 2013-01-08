@@ -1,5 +1,6 @@
 package org.fjn.neuralNetwork.multilayer
 
+import architecture.{NetworkData, FeedForwardNetwork}
 import org.specs2.mutable.Specification
 import java.io.{FileInputStream, ObjectInputStream, ObjectOutputStream, FileOutputStream}
 import activation.{Sigmoidea, ActivationFunction}
@@ -13,7 +14,7 @@ class NN_test extends  Specification {
   "training a NN" should {
     "run" in {
     `testAlgorithm` mustEqual true
-     refineAlgorithm mustEqual true
+//     refineAlgorithm mustEqual true
       testDeSerializer mustEqual true
    //   extrapolationTest mustEqual true
 
@@ -41,7 +42,7 @@ class NN_test extends  Specification {
     val mask1 = MaskFactory.getMask(nParam=4,nT=normalizer.nT,true)
 
     nn2.setMask(0,mask1)
-    val err = nn2.solve(500)
+    val err = nn2.solve(100)
 
 
     val output = new ObjectOutputStream(new FileOutputStream("C:\\temp\\test.obj"))
@@ -90,32 +91,6 @@ class NN_test extends  Specification {
 
   }
 
-  def extrapolationTest={
-
-    val input = new ObjectInputStream(new FileInputStream("C:\\temp\\test.obj"))
-    val obj = input.readObject()
-    input.close()
-    val m2 = obj.asInstanceOf[FeedForwardNetwork]
-
-    val x = TimeExtrapolator.extrapolation(normalizer.normalizedSamples.head.input,15,m2,normalizer.nT).map(normalizer.normalizer.deNormaliseY _)
-
-    import org.math.plot._
-    // create your PlotPanel (you can use it as a JPanel)
-    val plot = new Plot2DPanel();
-
-    // add a line plot to the PlotPanel
-
-    plot.addLinePlot("real IBEX 35", (0 until x.length).map(s => s.asInstanceOf[Double]).toArray,x.map(s => s(0,0)).toArray)
-
-    // put the PlotPanel in a JFrame, as a JPanel
-    val frame = new JFrame("a plot panel");
-    frame.setContentPane(plot);
-    frame.setVisible(true);
-
-    val ln = readLine()
-    true
-
-  }
   def testDeSerializer={
 
     val input = new ObjectInputStream(new FileInputStream("C:\\temp\\test.obj"))

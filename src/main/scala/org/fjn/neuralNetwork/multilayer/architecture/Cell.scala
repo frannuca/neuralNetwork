@@ -1,6 +1,6 @@
-package org.fjn.neuralNetwork.multilayer
+package org.fjn.neuralNetwork.multilayer.architecture
 
-import activation.ActivationFunction
+import org.fjn.neuralNetwork.multilayer.activation.ActivationFunction
 
 
 case class CellData(out:Double,diffOut:Double)

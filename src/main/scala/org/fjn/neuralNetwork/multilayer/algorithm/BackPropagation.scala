@@ -1,6 +1,7 @@
-package org.fjn.neuralNetwork.multilayer
+package org.fjn.neuralNetwork.multilayer.algorithm
 
 import org.fjn.neuralNetwork.reader.TrainingData
+import org.fjn.neuralNetwork.multilayer.architecture.Network
 
 trait BackPropagation extends LearningAlgorithm{
 
@@ -15,7 +16,7 @@ trait BackPropagation extends LearningAlgorithm{
     //We save the current dW for later momentum addition
 
     if (layers.length < 3)
-      sys.error("invalid network layout. No network can have less than 3 layers: Input-Hidden-Output")
+      sys.error("invalid architecture layout. No architecture can have less than 3 layers: Input-Hidden-Output")
     else {
       var n = layers.size - 1
 

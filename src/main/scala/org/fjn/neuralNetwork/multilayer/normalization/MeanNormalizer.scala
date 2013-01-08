@@ -3,7 +3,6 @@ package org.fjn.neuralNetwork.multilayer.normalization
 import org.fjn.matrix.Matrix
 import collection.immutable.IndexedSeq
 import org.fjn.neuralNetwork.reader.{DataReader, TrainingData}
-import org.fjn.neuralNetwork.multilayer.{NetworkData}
 
 class MeanNormalizer(fileName:String,val triggerFunc:Function1[Double,Double]) extends Normalizer {
 

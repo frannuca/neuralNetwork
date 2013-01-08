@@ -1,8 +1,9 @@
-package org.fjn.neuralNetwork.multilayer
+package org.fjn.neuralNetwork.multilayer.algorithm
 
 import org.fjn.matrix.Matrix
 import org.fjn.neuralNetwork.common.NNMatrixExtensions
 import org.fjn.neuralNetwork.reader.TrainingData
+import org.fjn.neuralNetwork.multilayer.architecture.Network
 
 
 trait LearningAlgorithm extends Serializable with NNMatrixExtensions with OptimizationCtes{

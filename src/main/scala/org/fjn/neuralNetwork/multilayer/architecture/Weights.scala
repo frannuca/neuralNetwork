@@ -1,4 +1,4 @@
-package org.fjn.neuralNetwork.multilayer
+package org.fjn.neuralNetwork.multilayer.architecture
 
 import org.fjn.matrix.Matrix
 import collection.mutable

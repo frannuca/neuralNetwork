@@ -1,13 +1,14 @@
-package org.fjn.neuralNetwork.multilayer
+package org.fjn.neuralNetwork.multilayer.architecture
 
-import activation.ActivationFunction
 import org.fjn.matrix.Matrix
 import collection.immutable.IndexedSeq
+import org.fjn.neuralNetwork.multilayer.architecture
+import org.fjn.neuralNetwork.multilayer.activation.ActivationFunction
 
 class Layer(dim:Int,activationFunc:ActivationFunction) extends Serializable{
 
   def size = dim
-  val cells: IndexedSeq[Cell] = (0 until dim).map(i => new Cell(activationFunc))
+  val cells: IndexedSeq[architecture.Cell] = (0 until dim).map(i => new architecture.Cell(activationFunc))
 
   def apply(x:Matrix[Double],isInput:Boolean=false):Matrix[Double]={
     require(x.numberRows == cells.length && x.numberCols == 1)

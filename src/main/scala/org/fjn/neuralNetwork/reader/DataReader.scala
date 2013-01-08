@@ -1,8 +1,8 @@
 package org.fjn.neuralNetwork.reader
 
 import org.fjn.matrix.Matrix
-import org.fjn.neuralNetwork.multilayer.NetworkData
 import org.fjn.neuralNetwork.multilayer.normalization.{MeanNormalizer, Normalizer}
+import org.fjn.neuralNetwork.multilayer.architecture.NetworkData
 
 
 object DataReader{
