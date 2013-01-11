@@ -3,7 +3,7 @@ package org.fjn.neuralNetwork.multilayer.normalization
 import org.fjn.matrix.Matrix
 import org.fjn.neuralNetwork.reader.TrainingData
 
-trait Normalizer {
+trait Normalizer  extends Serializable {
 
   val triggerFunc:Function1[Double,Double]
 

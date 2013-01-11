@@ -97,10 +97,16 @@ trait Network
           minError= error1
         }
 
-        if (counter > 10){
+        if (counter > 10 && error1 < minError){
           lr= lr * 1.5
           counter = 0
         }
+        else if  (counter > 10 && error1 >  minError){
+          lr= lr * 0.75
+          counter = 0
+        }
+
+
         println("lr="+lr.toString)
         counter += 1
 

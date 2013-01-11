@@ -4,6 +4,7 @@ import org.fjn.neuralNetwork.reader.{MaskFactory, FinancialDataReader}
 import org.fjn.neuralNetwork.multilayer.architecture.{NetworkData, FeedForwardNetwork}
 import org.fjn.neuralNetwork.multilayer.activation.Sigmoidea
 import java.io.{FileInputStream, ObjectInputStream, FileOutputStream, ObjectOutputStream}
+import collection.immutable.IndexedSeq
 
 
 object FinancialTimeSeriesNN{
@@ -41,6 +42,8 @@ case class FinancialTimeSeriesNN(seriesData:TimeSeriesData,hiddenLayerSizes:Seq[
 
   val solve = network.solve _
 
+  val samplesFilename:String = normalizer.fileName
+
 
   def serializeObj(fileName:String){
     val output = new ObjectOutputStream(new FileOutputStream(fileName))
@@ -49,5 +52,33 @@ case class FinancialTimeSeriesNN(seriesData:TimeSeriesData,hiddenLayerSizes:Seq[
   }
 
 
+  def compute(inputFileName:String):Seq[Double]={
+
+    val localNormalizer =  new FinancialDataReader(
+      fileName = inputFileName,
+      triggerFunc = seriesData.triggerFunc.trigger,
+      nT = seriesData.nT,
+      outputIndex=Seq(seriesData.outputIndex),
+      outputDelay=0 until seriesData.outputDelayLength,
+      nAverage = seriesData.nAverage ,
+      regressionOrder = seriesData.regressionOrder
+    )
+
+    val dy = normalizer.normalizer.deNormaliseY _
+    val dx = normalizer.normalizer.deNormaliseX _
+
+
+    def reg:Function2[Double,Seq[Double],Double] = (xval:Double,cs:Seq[Double]) => {
+      cs.indices.map(n => cs(n)*math.pow(xval,n)).sum
+    }
+
+
+
+      val coefs =  dy(network(normalizer.normalizedSamples.last.input))
+      (0 until normalizer.outputDelay.length).map(v => reg(v.toDouble,coefs.getArray()))
+
+
+
+  }
 
 }
