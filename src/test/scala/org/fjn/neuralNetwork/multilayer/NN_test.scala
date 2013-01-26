@@ -51,7 +51,7 @@ class NN_test extends  Specification {
 
 
 
-    val err = pso.solve(5)
+    val err = pso.solve(100)
     pso.serializeObj("C:\\temp\\test.obj")
 
 
@@ -68,6 +68,22 @@ class NN_test extends  Specification {
 
     val result = m2.compute("C:\\Users\\fran\\Downloads\\IBEX35_06_12_2012.csv")
 
+
+
+    import org.math.plot._
+    // create your PlotPanel (you can use it as a JPanel)
+
+    val plot = new Plot2DPanel();
+    plot.addLinePlot("real IBEX 35", result.indices.map(_.toDouble).toArray, result.toArray);
+
+
+    // put the PlotPanel in a JFrame, as a JPanel
+    val frame = new JFrame("a plot panel");
+    frame.setContentPane(plot);
+    frame.setVisible(true);
+
+
+    val ln = readLine()
 
     true
   }
