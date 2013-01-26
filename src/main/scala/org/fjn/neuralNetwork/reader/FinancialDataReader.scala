@@ -2,7 +2,7 @@ package org.fjn.neuralNetwork.reader
 
 import java.io.{FileWriter, InputStreamReader, StringReader}
 import org.fjn.matrix.Matrix
-import org.fjn.neuralNetwork.multilayer.normalization.{DummyNormalizer, Normalizer, MeanNormalizer}
+import org.fjn.neuralNetwork.multilayer.normalization.{ Normalizer, MeanNormalizer}
 import collection.immutable.IndexedSeq
 import org.fjn.optimization.Regression
 import org.fjn.neuralNetwork.multilayer.architecture.NetworkData
