@@ -11,6 +11,9 @@ import collection.immutable
 import org.fjn.neuralNetwork.reader.{TrainingData, DataReader}
 import org.fjn.neuralNetwork.multilayer.activation.ActivationFunction
 import org.fjn.neuralNetwork.multilayer.algorithm.LearningAlgorithm
+import org.math.plot.Plot2DPanel
+import javax.swing.JFrame
+import util.Random
 
 case class NetworkData(layerDimensions:Seq[Int],activationFunction:ActivationFunction,dataSet:Seq[TrainingData])
 
@@ -35,8 +38,13 @@ trait Network
   def computeError:Double={
     val e = nnData.dataSet.map{sample =>
       val o = forward(sample.input)
-      val d = (o -sample.output)
-      math.sqrt((d * d.transpose)(0,0))
+        val d = (o -sample.output)
+      val a = math.sqrt((d * d.transpose)(0,0))
+      if (a.isInfinity || a.isNaN())
+      {
+        val aaa = 1
+      }
+      a
     }.toSeq.sum
 
     e
@@ -45,6 +53,7 @@ trait Network
 
   def solve(maxIter:Int):Double={
 
+    val frame = new JFrame("a plot panel");
 
     lr = lr0
     momentum= momentum0
@@ -62,7 +71,14 @@ trait Network
       dWs.foreach(_._2.zeros)
 
       println("iteration"+iteration.toString)
-      nnData.dataSet.foreach(learn)
+      val rnd = new Random(iteration)
+
+      nnData.dataSet.indices.foreach(i =>{
+
+        val orig = (rnd.nextDouble()*nnData.dataSet.length).toInt
+        learn(nnData.dataSet(orig%nnData.dataSet.length))
+      })
+      //nnData.dataSet.foreach(learn)
 
       updateWeights
       savedW
@@ -70,13 +86,14 @@ trait Network
 
 
 
-      if (error1>=error0){
+      if (error1>error0){
 
         println("lr="+lr.toString)
 
         counterErrors = counterErrors + 1
-        if (counterErrors > 15){
-          lr = lr *0.25
+
+        if (counterErrors >= 0){
+          lr = lr *0.75
 
           undoBackUp
           val a= dWsHistory
@@ -85,9 +102,8 @@ trait Network
           counterErrors = 0
 
         }
-        counter = 0
       }
-      else{
+      else if (error1 < error0){
 
         counterErrors = 0
         println("*****************************GOOD!!!!")
@@ -95,15 +111,24 @@ trait Network
         {
           backUp
           minError= error1
-        }
+          val plot = new Plot2DPanel();
+          for (o <- 0 until nnData.dataSet.head.output.numberRows)      {
 
-        if (counter > 10 && error1 < minError){
-          lr= lr * 1.5
-          counter = 0
+            plot.addLinePlot("real IBEX 35"+o.toString, nnData.dataSet.indices.map(_.toDouble).toArray, nnData.dataSet.map(_.output(o,0)).toArray);
+            plot.addLinePlot("simulated IBEX 35"+o.toString, nnData.dataSet.indices.map(_.toDouble).toArray, nnData.dataSet.map(v => this.apply(v.input)(o,0)).toArray);
+
+          }
+
+          // put the PlotPanel in a JFrame, as a JPanel
+
+
+          frame.setContentPane(plot);
+          frame.setVisible(true);
+          frame.repaint(500)
+
         }
-        else if  (counter > 10 && error1 >  minError){
-          lr= lr * 0.75
-          counter = 0
+        if  (counter > 10){
+          lr= lr * 1.05
         }
 
 
@@ -120,6 +145,8 @@ trait Network
       println("error0="+error0.toString)
       println("error1="+error1.toString)
       println("errorMin="+minError.toString)
+
+
 
     }
 

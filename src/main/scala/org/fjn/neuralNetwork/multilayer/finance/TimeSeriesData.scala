@@ -14,6 +14,11 @@ case class TimeSeriesData(
                             triggerFunc:ActivationFunction,
                             nT:Int,
                             outputIndex:Int,
-                            outputDelayLength:Int,
+                            outputDelay:Int,
+                            outWindowSize:Int,
                             nAverage:Int,
                             regressionOrder:Int)
+
+
+case class FinancialDataReaderData(fileName: String, triggerFunc: Function1[Double, Double],
+                                   nT: Int, outputIndex: Seq[Int], outputDelay: Seq[Int], nAverage: Int, regressionOrder: Int)

@@ -39,7 +39,13 @@ class MeanNormalizer(fileName:String,val triggerFunc:Function1[Double,Double]) e
 
   //normalizing inputs and outputs training set
   lazy val normalizedTrainingSet = originalTrainingSet.map(s =>{
-     new TrainingData(normaliseX(s.input),normaliseY(s.output))
+    val xn =          normaliseX(s.input)
+    val yn =           normaliseY(s.output)
+    if (!yn.getArray().forall(s => !s.isInfinite && s.isNaN)){
+      val a = 1
+    }
+
+     new TrainingData(xn,yn)
   })
 
 
@@ -64,6 +70,9 @@ class MeanNormalizer(fileName:String,val triggerFunc:Function1[Double,Double]) e
     val r = y.clone()
     y.getArray().indices.foreach{i=>
       r.set(i,0,norm(y(i,0),i))
+    }
+    if (! r.getArray().forall(s => !s.isInfinite && !s.isNaN)){
+      val a = 1
     }
     r
   }

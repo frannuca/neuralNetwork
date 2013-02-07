@@ -14,6 +14,8 @@ class NN_test extends  Specification {
 
   "training a NN" should {
     "run" in {
+
+      val filepath = getClass().getResource("/"+ "IBEX35Future_2006-2012.csv").getFile;
     `testAlgorithm` mustEqual true
 //     refineAlgorithm mustEqual true
       testDeSerializer mustEqual true
@@ -24,34 +26,25 @@ class NN_test extends  Specification {
 
   def `testAlgorithm`={
 
-    val normalizer =  new FinancialDataReader(
-      fileName = "C:\\Users\\fran\\Downloads\\IBEX35_06_12_2012.csv",
-      triggerFunc = new Sigmoidea().trigger,
-      nT = 15,
-      outputIndex=Seq(0),
-      outputDelay=0 until 5,
-      nAverage = 5 ,
-      regressionOrder = 2
-    )
-
-
+    val filepath = getClass().getResource("/"+ "IBEX35Future_2006-2012.csv").getFile;
     val timeSerData = TimeSeriesData(
-      fileName = "C:\\Users\\fran\\Downloads\\IBEX35_06_12_2012.csv",
+      fileName = filepath ,//"C:\\Users\\fran\\Downloads\\sinus.csv",,
       triggerFunc = new Sigmoidea(),
-      nT = 15,
+      nT = 10,
       outputIndex = 0,
-      outputDelayLength=5,
-      nAverage=5,
-      regressionOrder=2)
+      outputDelay=1,
+      outWindowSize = 1,
+      nAverage = 5,
+      regressionOrder=0)
 
     val pso = FinancialTimeSeriesNN(
       seriesData = timeSerData,
-      hiddenLayerSizes=Seq(100,25),
-      trainingData=TrainingAlgorithmData(lr0=0.01,momentum0=0.7))
+      hiddenLayerSizes=Seq(220),
+      trainingData=TrainingAlgorithmData(lr0=0.0001,momentum0=0.25))
 
 
 
-    val err = pso.solve(100)
+    val err = pso.solve(200)
     pso.serializeObj("C:\\temp\\test.obj")
 
 
@@ -65,6 +58,7 @@ class NN_test extends  Specification {
 
     val m2 = FinancialTimeSeriesNN.deserialize("C:\\temp\\test.obj")
 
+    m2.solve(100)
 
     val result = m2.compute("C:\\Users\\fran\\Downloads\\IBEX35_06_12_2012.csv")
 
@@ -74,8 +68,8 @@ class NN_test extends  Specification {
     // create your PlotPanel (you can use it as a JPanel)
 
     val plot = new Plot2DPanel();
-    plot.addLinePlot("real IBEX 35", result.indices.map(_.toDouble).toArray, result.toArray);
-
+    plot.addLinePlot("real IBEX 35", result.indices.map(_.toDouble).toArray, result.map(_._2).toArray);
+    plot.addLinePlot("simulated IBEX 35", result.indices.map(_.toDouble).toArray, result.map(_._1).toArray);
 
     // put the PlotPanel in a JFrame, as a JPanel
     val frame = new JFrame("a plot panel");
