@@ -1,6 +1,6 @@
 package org.fjn.neuralNetwork.multilayer.activation
 
-class Sigmoidea(val c:Double = 1.0) extends ActivationFunction  {
+class Sigmoidea(val c:Double = 1.25) extends ActivationFunction  {
   def trigger = f _
   def diffTrigger = df _
 

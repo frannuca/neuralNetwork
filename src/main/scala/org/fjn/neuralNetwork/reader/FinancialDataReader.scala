@@ -5,27 +5,20 @@ import org.fjn.neuralNetwork.multilayer.normalization.{ Normalizer, MeanNormaliz
 import org.fjn.optimization.Regression
 import org.fjn.neuralNetwork.multilayer.finance.TimeSeriesData
 import collection.immutable.IndexedSeq
+import org.math.plot.Plot2DPanel
+import javax.swing.JFrame
 
-/**
- * financial data reader. This class transform historical data presented with the yahoo history format into valid
- * time series data given a variety of parameters including time window forecast etc...
- */
-case class FinancialDataReader(data: TimeSeriesData) extends FinancialDataReaderBase{
-
-  outer:FinancialDataReader =>
-
-  import data._
-  //val regressor = new Regression(regressionOrder)
-
-  private def movingAverage(data:Array[TrainingData],nSamples:Int):Seq[TrainingData]={
+object OFinancialDataReader {
+   def movingAverage(data:Array[TrainingData],nSamples:Int):Seq[TrainingData]={
     if (nSamples<=0) data
     else{
       val zeroInput = data.head.input.clone().zeros
       val zeroOut = data.head.output.clone().zeros
       val zeroTraining = new TrainingData(zeroInput,zeroOut)
 
-      for (i<- data.indices.drop(nSamples))yield{
-        val a = data.slice(i-nSamples,i).foldLeft(zeroTraining)((b,td)=> new TrainingData((td.input+b.input),(td.output+b.output)))
+      for (i<- data.indices)yield{
+        val a0 = data.slice(i-nSamples,i)
+        val a = a0.foldLeft(zeroTraining)((b,td)=> new TrainingData((td.input+b.input),(td.output+b.output)))
         new TrainingData(input= a.input/nSamples.toDouble,output=a.output/nSamples.toDouble)
 
       }
@@ -33,56 +26,88 @@ case class FinancialDataReader(data: TimeSeriesData) extends FinancialDataReader
 
   }
 
-  private def toIncremental(data:Array[Double],tol:Double=1e-6):Seq[Double]={
+  def toIncremental(data:Array[Double],tol:Double=1e-6):Seq[Double]={
 
     data.indices.drop(1).map(n =>{
-       (data(n)-data(n-1))/(math.abs(data(n-1)) max tol)
+      (data(n)-data(n-1))/(math.abs(data(n-1)) max tol)
     })
   }
 
-  private val rawSamples: Array[TrainingData] = {
-    val aux1 = movingAverage(movingAverage(movingAverage(DataReader.readSamples(fileName),nAverage).toArray,nAverage).toArray,nAverage).toArray//rawSamples.toSeq//
+}
+/**
+ * financial data reader. This class transform historical data presented with the yahoo history format into valid
+ * time series data given a variety of parameters including time window forecast etc...
+ */
+case class FinancialDataReader(data: TimeSeriesData) extends FinancialDataReaderBase{
+  outer:FinancialDataReader =>
 
-    val numberPar = aux1.head.input.getArray().length
-    val paramSeriesVector = (0 until numberPar).map(n => toIncremental(aux1.map(_.input.getArray()(n))))
-
-    for (p <- paramSeriesVector.indices;
-         nPar <- paramSeriesVector(p).indices){
-        aux1(nPar).input.set(p,0,paramSeriesVector(p)(nPar))
-    }
+  import OFinancialDataReader._
+  import data._
+  val regressor = new Regression(regressionOrder)
 
 
-    aux1.take(paramSeriesVector.head.length)
 
-  }
+//  private val rawSamples: Array[TrainingData] = {
+//
+//    val aux1 = DataReader.readSamples(fileName)
+//
+//    val numberPar = aux1.head.input.getArray().length
+//    val paramSeriesVector = (0 until numberPar).map(n => toIncremental(aux1.map(_.input.getArray()(n))))
+//
+//    for (p <- paramSeriesVector.indices;
+//         nPar <- paramSeriesVector(p).indices){
+//        aux1(nPar).input.set(p,0,paramSeriesVector(p)(nPar))
+//    }
+//
+//
+//    aux1.take(paramSeriesVector.head.length)
+//
+//  }
 
-  val samples = rawSamples.toSeq
+  val samples = movingAverage(DataReader.readSamples(fileName),nAverage).toSeq//rawSamples.toSeq
 
   def processOutput(vIn:Seq[Double]):Matrix[Double]={
-//    val (hi,lo) = (vIn.max,vIn.min)
-//    val mu = vIn.sum/vIn.length.toDouble
-//    val norm = vIn.map(x => (x-mu)/(hi-lo))
-//    val le = norm.length.toDouble-1.0
-//    val xCoord = norm.indices.map(i => i.toDouble/le)
-//    val outputs: Seq[Double] = regressor.getRegressionCoefficients(xCoord zip norm)
+
+
+//    val outputs: Seq[Double] = regressor.getRegressionCoefficients(vIn.indices.map(_.toDouble) zip vIn)
 //     new Matrix[Double](outputs.length,1) <= outputs
 
     new Matrix[Double](vIn.length,1) <= vIn
   }
-  val timeSeriesSequence = DataReader.readSamples(writeTrainingSet)
-//  val normalizer = new Normalizer {
-//    def deNormaliseX(x: Matrix[Double]) = x
-//
-//    def normaliseY(y: Matrix[Double]) = y
-//
-//    def deNormaliseY(x: Matrix[Double]) = x
-//
-//    def normaliseX(x: Matrix[Double]) = x
-//
-//    val normalizedTrainingSet = timeSeriesSequence.toArray
-//    val originalTrainingSet = timeSeriesSequence.toArray
-//    val triggerFunc = data.triggerFunc.trigger
-//  }
 
-  val normalizer = new MeanNormalizer(timeSeriesFileName,triggerFunc.trigger)
+
+  val normalizer = new MeanNormalizer(writeTrainingSet,triggerFunc.trigger)
+
+  val plot = new Plot2DPanel();
+  //plot.addLinePlot("real IBEX 35", result.indices.map(_.toDouble).toArray, result.map(_._2).toArray);
+  plot.addLinePlot("simulated IBEX 35", normalizedSamples.indices.map(_.toDouble).toArray, normalizedSamples.map(_.output(0,0)).toArray);
+
+  // put the PlotPanel in a JFrame, as a JPanel
+  val frame = new JFrame("a plot panel");
+  frame.setContentPane(plot);
+  frame.setVisible(true);
+}
+
+object testMovingAverage extends App{
+
+  import OFinancialDataReader._
+
+  val filepath = getClass().getResource("/"+ "dowjones.csv").getFile;
+  val dataTraining: Array[TrainingData] = DataReader.readSamples(fileName = filepath)
+
+  val b0= List(OFinancialDataReader.movingAverage(dataTraining.toArray,-1))++
+    List(OFinancialDataReader.movingAverage(dataTraining.toArray,5))
+  val plot = new Plot2DPanel();
+  b0.foreach(x =>{
+
+    plot.addLinePlot("smoothing", x.indices.map(_.toDouble).toArray, x.map(_.input(0,0)).toArray)
+  } )
+
+  //plot.addLinePlot("real IBEX 35", result.indices.map(_.toDouble).toArray, result.map(_._2).toArray);
+
+
+  // put the PlotPanel in a JFrame, as a JPanel
+  val frame = new JFrame("a plot panel");
+  frame.setContentPane(plot);
+  frame.setVisible(true);
 }

@@ -53,7 +53,7 @@ trait Network
 
   def solve(maxIter:Int):Double={
 
-    val frame = new JFrame("a plot panel");
+    val frames = (0 until nnData.dataSet.head.output.numberRows).map(i => new JFrame("a plot panel" + i.toString))
 
     lr = lr0
     momentum= momentum0
@@ -111,20 +111,21 @@ trait Network
         {
           backUp
           minError= error1
-          val plot = new Plot2DPanel();
+          val plot = (0 until nnData.dataSet.head.output.numberRows).map( _ => new Plot2DPanel());
           for (o <- 0 until nnData.dataSet.head.output.numberRows)      {
 
-            plot.addLinePlot("real IBEX 35"+o.toString, nnData.dataSet.indices.map(_.toDouble).toArray, nnData.dataSet.map(_.output(o,0)).toArray);
-            plot.addLinePlot("simulated IBEX 35"+o.toString, nnData.dataSet.indices.map(_.toDouble).toArray, nnData.dataSet.map(v => this.apply(v.input)(o,0)).toArray);
+            plot(o).addLinePlot("real IBEX 35"+o.toString, nnData.dataSet.indices.map(_.toDouble).toArray, nnData.dataSet.map(_.output(o,0)).toArray);
+            plot(o).addLinePlot("simulated IBEX 35"+o.toString, nnData.dataSet.indices.map(_.toDouble).toArray, nnData.dataSet.map(v => this.apply(v.input)(o,0)).toArray);
+            frames(o).setContentPane(plot(o));
+            frames(o).setVisible(true);
+            frames(o).repaint(500)
+
 
           }
 
           // put the PlotPanel in a JFrame, as a JPanel
 
 
-          frame.setContentPane(plot);
-          frame.setVisible(true);
-          frame.repaint(500)
 
         }
         if  (counter > 10){

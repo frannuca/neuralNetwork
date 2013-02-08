@@ -6,6 +6,7 @@ import org.fjn.neuralNetwork.reader.{DataReader, TrainingData}
 
 class MeanNormalizer(fileName:String,val triggerFunc:Function1[Double,Double]) extends Normalizer {
 
+
   val originalTrainingSet: Array[TrainingData] = DataReader.readSamples(fileName)
 
   val triggerMaxY:Double = triggerFunc(100)

@@ -11,16 +11,18 @@ trait Weights extends Serializable{
 
   def generateLayerIndices = 0 until layers.length-1
 
+
+  lazy val Ws = new scala.collection.mutable.HashMap[(Int,Int),Matrix[Double]]()
   def randomizeWeigths{
     val rngen = new scala.util.Random()
 
     Ws.foreach(item => item match{
-      case ((l1,l2),w)=> w.getArray().indices.foreach(i=> w.getArray()(i)= w.getArray()(i)*(1.0+(rngen.nextDouble()-0.5)* (if(i==0) 1 else 1)))
+      case ((l1,l2),w)=> w.getArray().indices.foreach(i=> w.getArray()(i)= w.getArray()(i)*(1.0+(rngen.nextDouble()-0.5) ))
     })
   }
-  lazy val Ws = new scala.collection.mutable.HashMap[(Int,Int),Matrix[Double]]()
+
   generateLayerIndices.map(l =>{
-    Ws += (l,l+1) -> (new Matrix[Double](layers(l).size+1,layers(l+1).size).random-0.5)*( if(l==0) .1 else 1)
+    Ws += (l,l+1) -> (new Matrix[Double](layers(l).size+1,layers(l+1).size).random)* (if(l==0) 1/self.nnData.dataSet.head.input.numberRows.toDouble/self.layers(1).size.toDouble else 5/self.layers(l).size.toDouble)
   })
 
   lazy val masks = new scala.collection.mutable.HashMap[(Int,Int),Matrix[Double]]()

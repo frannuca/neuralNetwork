@@ -4,6 +4,7 @@ import org.fjn.neuralNetwork.reader.{MaskFactory, FinancialDataReader}
 import org.fjn.neuralNetwork.multilayer.architecture.{NetworkData, FeedForwardNetwork}
 import org.fjn.neuralNetwork.multilayer.activation.Sigmoidea
 import java.io.{FileInputStream, ObjectInputStream, FileOutputStream, ObjectOutputStream}
+import org.fjn.matrix.Matrix
 
 
 object FinancialTimeSeriesNN{
@@ -41,14 +42,11 @@ case class FinancialTimeSeriesNN(seriesData:TimeSeriesData,hiddenLayerSizes:Seq[
   }
 
 
-  def compute(inputFileName:String):(Seq[(Double,Double)])={
+  def compute(inputFileName:String): Seq[Matrix[Double]] ={
 
+    val normalizer2 =  new FinancialDataReader( seriesData.copy(fileName = inputFileName) )
 
-    normalizer.normalizer.originalTrainingSet.map(in =>{
-      (network(in.input)(0,0),normalizer.normalizer.normaliseY(in.output)(0,0))
-    })
-
-
+    normalizer2.normalizer.normalizedTrainingSet.map(x => network(x.input)).toSeq
 
   }
 
