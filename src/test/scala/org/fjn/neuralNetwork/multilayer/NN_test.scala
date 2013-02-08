@@ -34,12 +34,12 @@ class NN_test extends  Specification {
       outputIndex = 0,
       outputDelay=1,
       outWindowSize = 1,
-      nAverage = -5,
+      nAverage = 3,
       regressionOrder=0)
 
     val pso = FinancialTimeSeriesNN(
       seriesData = timeSerData,
-      hiddenLayerSizes=Seq(50,50),
+      hiddenLayerSizes=Seq(250),
       trainingData=TrainingAlgorithmData(lr0=0.0001,momentum0=0.8))
 
 

@@ -17,9 +17,20 @@ object OFinancialDataReader {
       val zeroTraining = new TrainingData(zeroInput,zeroOut)
 
       for (i<- data.indices)yield{
-        val a0 = data.slice(i-nSamples,i)
-        val a = a0.foldLeft(zeroTraining)((b,td)=> new TrainingData((td.input+b.input),(td.output+b.output)))
-        new TrainingData(input= a.input/nSamples.toDouble,output=a.output/nSamples.toDouble)
+        data.slice(i-nSamples,i+nSamples).toList match{
+          case Nil => data.head
+          case a0:List[TrainingData] =>{
+            if (a0.length<2.0*nSamples)
+              data(i)
+            else{
+              val a = a0.foldLeft(zeroTraining)((b,td)=> new TrainingData((td.input+b.input),(td.output+b.output)))
+              new TrainingData(input= a.input/nSamples.toDouble/2.0,output=a.output/nSamples.toDouble/2.0)
+            }
+
+          }
+        }
+
+
 
       }
     }
@@ -96,7 +107,7 @@ object testMovingAverage extends App{
   val dataTraining: Array[TrainingData] = DataReader.readSamples(fileName = filepath)
 
   val b0= List(OFinancialDataReader.movingAverage(dataTraining.toArray,-1))++
-    List(OFinancialDataReader.movingAverage(dataTraining.toArray,5))
+    List(OFinancialDataReader.movingAverage(dataTraining.toArray,3))
   val plot = new Plot2DPanel();
   b0.foreach(x =>{
 
