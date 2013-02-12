@@ -10,6 +10,10 @@ class Layer(dim:Int,activationFunc:ActivationFunction) extends Serializable{
   def size = dim
   val cells: IndexedSeq[architecture.Cell] = (0 until dim).map(i => new architecture.Cell(activationFunc))
 
+  def clearSaturationMeasure={
+    cells.foreach(c => c.clearSaturationMeasure)
+  }
+
   def apply(x:Matrix[Double],isInput:Boolean=false):Matrix[Double]={
     require(x.numberRows == cells.length && x.numberCols == 1)
 

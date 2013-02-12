@@ -34,17 +34,17 @@ class NN_test extends  Specification {
       outputIndex = 0,
       outputDelay=1,
       outWindowSize = 1,
-      nAverage = 3,
+      nAverage = 2,
       regressionOrder=0)
 
     val pso = FinancialTimeSeriesNN(
       seriesData = timeSerData,
-      hiddenLayerSizes=Seq(250),
-      trainingData=TrainingAlgorithmData(lr0=0.0001,momentum0=0.8))
+      hiddenLayerSizes=Seq(200),
+      trainingData=TrainingAlgorithmData(lr0=0.001,momentum0=0.7))
 
 
 
-    val err = pso.solve(200)
+    val err = pso.solve(2000)
     pso.serializeObj("C:\\temp\\test.obj")
 
 
@@ -56,25 +56,26 @@ class NN_test extends  Specification {
   def testDeSerializer={
 
 
+    val filepath = getClass().getResource("/"+ "IBEX35Future_2006-2012.csv").getFile;
     val m2 = FinancialTimeSeriesNN.deserialize("C:\\temp\\test.obj")
 
-    m2.solve(100)
-
-    val result = m2.compute("C:\\Users\\fran\\Downloads\\IBEX35_06_12_2012.csv")
 
 
+    val result = m2.compute(filepath)
 
-    import org.math.plot._
-    // create your PlotPanel (you can use it as a JPanel)
 
-    val plot = new Plot2DPanel();
-    //plot.addLinePlot("real IBEX 35", result.indices.map(_.toDouble).toArray, result.map(_._2).toArray);
-    //plot.addLinePlot("simulated IBEX 35", result.indices.map(_.toDouble).toArray, result.map(_._1).toArray);
 
-    // put the PlotPanel in a JFrame, as a JPanel
-    val frame = new JFrame("a plot panel");
-    frame.setContentPane(plot);
-    frame.setVisible(true);
+//    import org.math.plot._
+//    // create your PlotPanel (you can use it as a JPanel)
+//
+//    val plot = new Plot2DPanel();
+//    //plot.addLinePlot("real IBEX 35", result.indices.map(_.toDouble).toArray, result.map(_._2).toArray);
+//    //plot.addLinePlot("simulated IBEX 35", result.indices.map(_.toDouble).toArray, result.map(_._1).toArray);
+//
+//    // put the PlotPanel in a JFrame, as a JPanel
+//    val frame = new JFrame("a plot panel");
+//    frame.setContentPane(plot);
+//    frame.setVisible(true);
 
 
     val ln = readLine()

@@ -9,8 +9,8 @@ class MeanNormalizer(fileName:String,val triggerFunc:Function1[Double,Double]) e
 
   val originalTrainingSet: Array[TrainingData] = DataReader.readSamples(fileName)
 
-  val triggerMaxY:Double = triggerFunc(100)
-  val triggerMinY:Double = triggerFunc(-100)
+  val triggerMaxY:Double = triggerFunc(100) *0.85
+  val triggerMinY:Double = triggerFunc(-100) *0.85
 
 
 
@@ -53,8 +53,9 @@ class MeanNormalizer(fileName:String,val triggerFunc:Function1[Double,Double]) e
   def normaliseX(x:Matrix[Double]):Matrix[Double]={
 
     def norm = (x:Double,index:Int) =>{
-      (x - maxMinMeanInput(index)._3)/(maxMinMeanInput(index)._1-maxMinMeanInput(index)._2)*maxDifTriggerX
+      (x - maxMinMeanInput(index)._2)/(maxMinMeanInput(index)._1-maxMinMeanInput(index)._2)*maxDifTriggerX-0.5*maxDifTriggerX
     }
+
 
     val r = x.clone()
     x.getArray().indices.foreach{i=>
@@ -65,8 +66,20 @@ class MeanNormalizer(fileName:String,val triggerFunc:Function1[Double,Double]) e
 
   def normaliseY(y:Matrix[Double]):Matrix[Double]={
 
-    def norm = (y:Double,index:Int) =>
-      (y - maxMinMeanOutput(index)._3)/(maxMinMeanOutput(index)._1-maxMinMeanOutput(index)._2) * maxDifTriggerY
+    def norm = (y:Double,index:Int) => {
+      val a = (y - maxMinMeanOutput(index)._2)/(maxMinMeanOutput(index)._1-maxMinMeanOutput(index)._2) * maxDifTriggerY-0.5*maxDifTriggerY
+      if(a < -1.0)
+      {
+        val yy = y
+        val i = index
+        val mn =   maxMinMeanOutput(index)._2
+        val mx =   maxMinMeanOutput(index)._1
+        val mu  =  maxMinMeanOutput(index)._3
+        val ss = 0
+      }
+      a
+    }
+
 
     val r = y.clone()
     y.getArray().indices.foreach{i=>
@@ -80,7 +93,8 @@ class MeanNormalizer(fileName:String,val triggerFunc:Function1[Double,Double]) e
 
   def deNormaliseX(x:Matrix[Double]):Matrix[Double]={
 
-    def deNorm = (x:Double,index:Int)=> x * (maxMinMeanInput(index)._1-maxMinMeanInput(index)._2)/maxDifTriggerX + maxMinMeanInput(index)._3
+
+    def deNorm = (x:Double,index:Int)=> (x+0.5*maxDifTriggerX)/maxDifTriggerX*(maxMinMeanInput(index)._1-maxMinMeanInput(index)._2) + maxMinMeanInput(index)._2
     val r = x.clone()
     x.getArray().indices.foreach{i=>
       r.set(i,0,deNorm(x(i,0),i))
@@ -98,7 +112,7 @@ class MeanNormalizer(fileName:String,val triggerFunc:Function1[Double,Double]) e
         val a2 = maxMinMeanOutput(index)._2
         val a3 = maxMinMeanOutput(index)._3
 
-        x * (maxMinMeanOutput(index)._1-maxMinMeanOutput(index)._2)/maxDifTriggerY + maxMinMeanOutput(index)._3
+        (x+0.5*maxDifTriggerY)/maxDifTriggerY*(maxMinMeanOutput(index)._1-maxMinMeanOutput(index)._2) + maxMinMeanOutput(index)._2
       }
 
 

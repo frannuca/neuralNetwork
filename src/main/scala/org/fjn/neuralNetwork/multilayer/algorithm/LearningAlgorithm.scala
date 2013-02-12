@@ -19,7 +19,7 @@ trait LearningAlgorithm extends Serializable with NNMatrixExtensions with Optimi
 
       self.Ws((n-1,n)) <:= self.masks((n-1,n))
 
-      val o = fillOnes(in).transpose * self.Ws((n-1,n))
+      val o: Matrix[Double] = fillOnes(in).transpose * self.Ws((n-1,n))
 
 
       in = self.layers(n)(o.transpose)

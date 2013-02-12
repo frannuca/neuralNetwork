@@ -26,6 +26,12 @@ trait Network
   val nnData:NetworkData
   lazy protected val layers: Seq[Layer] = nnData.layerDimensions.map(dim =>  new Layer(dim,nnData.activationFunction))
 
+
+
+  def clearSaturationMeasures={
+        layers.foreach(l => l.clearSaturationMeasure)
+  }
+
   def setMask(nlayer0:Int, scentil:Matrix[Double])={
     masks((nlayer0,nlayer0+1)).copyFrom(scentil)
   }
@@ -51,6 +57,7 @@ trait Network
   }
 
 
+
   def solve(maxIter:Int):Double={
 
     val frames = (0 until nnData.dataSet.head.output.numberRows).map(i => new JFrame("a plot panel" + i.toString))
@@ -73,11 +80,14 @@ trait Network
       println("iteration"+iteration.toString)
       val rnd = new Random(iteration)
 
-      nnData.dataSet.indices.foreach(i =>{
 
+      clearSaturationMeasures
+      nnData.dataSet.indices.foreach(i =>{
         val orig = (rnd.nextDouble()*nnData.dataSet.length).toInt
         learn(nnData.dataSet(orig%nnData.dataSet.length))
       })
+
+
       //nnData.dataSet.foreach(learn)
 
       updateWeights
@@ -91,15 +101,15 @@ trait Network
         println("lr="+lr.toString)
 
         counterErrors = counterErrors + 1
+        lr = lr *0.75
+        if (counterErrors >= 5){
 
-        if (counterErrors >= 0){
-          lr = lr *0.75
 
           undoBackUp
           val a= dWsHistory
           println("*****************************Randomizing Weights")
           randomizeWeigths
-          counterErrors = 0
+          counterErrors = -5
 
         }
       }
@@ -114,11 +124,13 @@ trait Network
           val plot = (0 until nnData.dataSet.head.output.numberRows).map( _ => new Plot2DPanel());
           for (o <- 0 until nnData.dataSet.head.output.numberRows)      {
 
+
             plot(o).addLinePlot("real IBEX 35"+o.toString, nnData.dataSet.indices.map(_.toDouble).toArray, nnData.dataSet.map(_.output(o,0)).toArray);
-            plot(o).addLinePlot("simulated IBEX 35"+o.toString, nnData.dataSet.indices.map(_.toDouble).toArray, nnData.dataSet.map(v => this.apply(v.input)(o,0)).toArray);
+            plot(o).addLinePlot("simulated IBEX 35"+o.toString, nnData.dataSet.indices.map(_.toDouble).toArray, nnData.dataSet.map(v =>  this.apply(v.input)(o,0)).toArray);
             frames(o).setContentPane(plot(o));
             frames(o).setVisible(true);
-            frames(o).repaint(500)
+
+            frames(o).repaint(500,0,0,300,150)
 
 
           }

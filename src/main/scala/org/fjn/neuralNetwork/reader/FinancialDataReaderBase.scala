@@ -12,6 +12,7 @@ trait FinancialDataReaderBase extends Serializable {
   val normalizer: Normalizer
   def samples: Seq[TrainingData]
   def processOutput(outVector: Seq[Double]): Matrix[Double]
+  protected val rawSamples: Array[TrainingData]
 
 
   val timeSeriesFileName = data.fileName.substring(0, data.fileName.indexOf(".")) + "_nt" ++ data.nT.toString + "_dt" +

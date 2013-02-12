@@ -1,10 +1,13 @@
 package org.fjn.neuralNetwork.multilayer.finance
 
-import org.fjn.neuralNetwork.reader.{MaskFactory, FinancialDataReader}
+import org.fjn.neuralNetwork.reader.{DataReader, TrainingData, MaskFactory, FinancialDataReader}
 import org.fjn.neuralNetwork.multilayer.architecture.{NetworkData, FeedForwardNetwork}
 import org.fjn.neuralNetwork.multilayer.activation.Sigmoidea
 import java.io.{FileInputStream, ObjectInputStream, FileOutputStream, ObjectOutputStream}
 import org.fjn.matrix.Matrix
+import Jama.Matrix
+import org.fjn.matrix.Matrix
+import collection.mutable.ListBuffer
 
 
 object FinancialTimeSeriesNN{
@@ -42,12 +45,28 @@ case class FinancialTimeSeriesNN(seriesData:TimeSeriesData,hiddenLayerSizes:Seq[
   }
 
 
-  def compute(inputFileName:String): Seq[Matrix[Double]] ={
+  def extractTimeSeriesInput(input:Seq[TrainingData]): org.fjn.matrix.Matrix[Double] ={
 
-    val normalizer2 =  new FinancialDataReader( seriesData.copy(fileName = inputFileName) )
+    val timeSeries = new ListBuffer[Double]()
 
-    normalizer2.normalizer.normalizedTrainingSet.map(x => network(x.input)).toSeq
+    val nPar = input.head.input.numberRows
+    for (
+      j <- 0 until nPar;
+      t <- input.length-seriesData.nT until input.length){
+         timeSeries += input(t).input(j,0)
+    }
 
+    new org.fjn.matrix.Matrix[Double](timeSeries.length,1) <= timeSeries
+  }
+
+  ///TODO: this function is wrong. It needs to assemble the vector of training data from the given time series
+  //Given a time series file compatible with the one used for training it returns the projected output
+  def compute(inputFileName:String): org.fjn.matrix.Matrix[Double] ={
+
+    val input = extractTimeSeriesInput(DataReader.readSamples(inputFileName))
+
+    normalizer.normalizer.deNormaliseY(network(normalizer.normalizer.normaliseX(input)))
   }
 
 }
+

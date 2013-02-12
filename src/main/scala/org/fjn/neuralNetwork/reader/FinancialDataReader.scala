@@ -58,34 +58,33 @@ case class FinancialDataReader(data: TimeSeriesData) extends FinancialDataReader
 
 
 
-//  private val rawSamples: Array[TrainingData] = {
-//
-//    val aux1 = DataReader.readSamples(fileName)
-//
-//    val numberPar = aux1.head.input.getArray().length
-//    val paramSeriesVector = (0 until numberPar).map(n => toIncremental(aux1.map(_.input.getArray()(n))))
-//
-//    for (p <- paramSeriesVector.indices;
-//         nPar <- paramSeriesVector(p).indices){
-//        aux1(nPar).input.set(p,0,paramSeriesVector(p)(nPar))
-//    }
-//
-//
-//    aux1.take(paramSeriesVector.head.length)
-//
-//  }
+  //Incremental data extraction mode
+  protected val rawSamples: Array[TrainingData] = {
 
-  val samples = movingAverage(DataReader.readSamples(fileName),nAverage).toSeq//rawSamples.toSeq
+    val aux1 = DataReader.readSamples(fileName)
 
+    val numberPar = aux1.head.input.getArray().length
+    val paramSeriesVector = (0 until numberPar).map(n => toIncremental(aux1.map(_.input.getArray()(n))))
+
+    for (p <- paramSeriesVector.indices;
+         nPar <- paramSeriesVector(p).indices){
+        aux1(nPar).input.set(p,0,paramSeriesVector(p)(nPar))
+    }
+
+
+    aux1.take(paramSeriesVector.head.length)
+  }
+
+  //Smoothing of the data
+  val samples = movingAverage(rawSamples,nAverage).toSeq//rawSamples.toSeq
+
+  //Dummy output process. It is not necessary to further process output when performing incremental
   def processOutput(vIn:Seq[Double]):Matrix[Double]={
-
-
 //    val outputs: Seq[Double] = regressor.getRegressionCoefficients(vIn.indices.map(_.toDouble) zip vIn)
 //     new Matrix[Double](outputs.length,1) <= outputs
 
     new Matrix[Double](vIn.length,1) <= vIn
   }
-
 
   val normalizer = new MeanNormalizer(writeTrainingSet,triggerFunc.trigger)
 
