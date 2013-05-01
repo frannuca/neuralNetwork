@@ -15,5 +15,9 @@ class AsymetricSigmoidea(val c:Double=1.25) extends ActivationFunction  {
     val a = (f(x + 1e-7) - f(x - 1e-7)) / 2e-7
     a
   }
+
+  val maxXLimit = 100d
+  val minXLimit = -100d
+  val saturationCoefficient = 0.95d
 }
 

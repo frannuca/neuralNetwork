@@ -3,31 +3,27 @@ package org.fjn.neuralNetwork.multilayer.algorithm
 import org.fjn.matrix.Matrix
 import org.fjn.neuralNetwork.common.NNMatrixExtensions
 import org.fjn.neuralNetwork.reader.TrainingData
-import org.fjn.neuralNetwork.multilayer.architecture.Network
+import org.fjn.neuralNetwork.multilayer.architecture.{OutputLayerExtractor, HiddenLayerExtractor, InputLayerExtractor, Network}
 
 
-trait LearningAlgorithm extends Serializable with NNMatrixExtensions with OptimizationCtes{
-   self: Network =>
-  def learn(sample:TrainingData)
+trait LearningAlgorithm extends Serializable with NNMatrixExtensions with OptimizationCtes {
+  self: Network =>
+  def learn(sample: TrainingData): Double
 
- protected def forward(x:Matrix[Double]):Matrix[Double]={
-
-   applyMasks
-    var in = x
-    self.layers(0)(in,true)
-    (1 until self.layers.length).foreach( n => {
-
-      self.Ws((n-1,n)) <:= self.masks((n-1,n))
-
-      val o: Matrix[Double] = fillOnes(in).transpose * self.Ws((n-1,n))
+  protected def forward(x: Matrix[Double]): Matrix[Double] = {
 
 
-      in = self.layers(n)(o.transpose)
-
-    })
+    var in = new Matrix[Double](1, 1)
+    applyMasks
+    self.layers.foreach {
+      case InputLayerExtractor(n) => in = self.layers(n).process(x)
+      case HiddenLayerExtractor(n) => self.layers(n).process(fillOnes(in).transpose * self.Ws((n - 1, n)))
+      case OutputLayerExtractor(n) => self.layers(n).process(fillOnes(in).transpose * self.Ws((n - 1, n)))
+    }
 
     in
   }
+
 }
 
 

@@ -2,13 +2,6 @@ package org.fjn.neuralNetwork.reader
 
 import org.fjn.matrix.Matrix
 
-/**
- * Created with IntelliJ IDEA.
- * User: fran
- * Date: 05/12/12
- * Time: 19:26
- * To change this template use File | Settings | File Templates.
- */
 object MaskFactory {
 
   def getMask(nParam:Int,nT:Int,addOffset:Boolean):Matrix[Double]={

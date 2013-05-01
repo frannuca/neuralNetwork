@@ -6,7 +6,7 @@ import org.specs2.mutable.Specification
 import java.io.{FileInputStream, ObjectInputStream, ObjectOutputStream, FileOutputStream}
 import activation.{Sigmoidea, ActivationFunction}
 import org.fjn.matrix.Matrix
-import org.fjn.neuralNetwork.reader.{DataReader, TrainingData, FinancialDataReader, MaskFactory}
+import org.fjn.neuralNetwork.reader.{TrainingData, FinancialDataReader, MaskFactory}
 import javax.swing.JFrame
 
 
@@ -27,24 +27,25 @@ class NN_test extends  Specification {
   def `testAlgorithm`={
 
     val filepath = getClass().getResource("/"+ "dowjones.csv").getFile;
+
     val timeSerData = TimeSeriesData(
-      fileName = filepath ,//"C:\\Users\\fran\\Downloads\\sinus.csv",,
+      trainingData = DataReader.readSamples(filepath),
       triggerFunc = new Sigmoidea(),
       nT = 10,
       outputIndex = 0,
       outputDelay=1,
       outWindowSize = 1,
-      nAverage = 2,
+      nAverage = -2,
       regressionOrder=0)
 
     val pso = FinancialTimeSeriesNN(
       seriesData = timeSerData,
-      hiddenLayerSizes=Seq(200),
-      trainingData=TrainingAlgorithmData(lr0=0.001,momentum0=0.7))
+      hiddenLayerSizes=Seq(20,20),
+      trainingData=TrainingAlgorithmData(lr0=0.00001,momentum0=0.7))
 
 
 
-    val err = pso.solve(2000)
+    val err = pso.solve(100)
     pso.serializeObj("C:\\temp\\test.obj")
 
 
@@ -56,7 +57,7 @@ class NN_test extends  Specification {
   def testDeSerializer={
 
 
-    val filepath = getClass().getResource("/"+ "IBEX35Future_2006-2012.csv").getFile;
+    val filepath = getClass().getResource("/"+ "dowjones.csv").getFile;
     val m2 = FinancialTimeSeriesNN.deserialize("C:\\temp\\test.obj")
 
 

@@ -11,7 +11,6 @@ trait NNMatrixExtensions extends Serializable{
   }
 
 
-
   def sub(m: Matrix[Double]): Matrix[Double] ={
     m.sub(0 until m.numberRows - 1, 0 until m.numberCols)
   }

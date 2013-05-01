@@ -5,15 +5,13 @@ import org.fjn.neuralNetwork.reader.TrainingData
 
 trait Normalizer  extends Serializable {
 
-  val triggerFunc:Function1[Double,Double]
+  val triggerFunc:(Double) => Double
 
-  val originalTrainingSet:Array[TrainingData]
-  val normalizedTrainingSet:Array[TrainingData]
+  val originalTrainingSet:Array[Matrix[Double]]
 
-  def normaliseX(x:Matrix[Double]):Matrix[Double]
-  def normaliseY(y:Matrix[Double]):Matrix[Double]
-  def deNormaliseX(x:Matrix[Double]):Matrix[Double]
-  def deNormaliseY(x:Matrix[Double]):Matrix[Double]
+  val normalizedSamples: Array[Matrix[Double]]
 
-
+  def normalise(x:Matrix[Double]):Matrix[Double]
+  def deNormalise(x:Matrix[Double]):Matrix[Double]
 }
+

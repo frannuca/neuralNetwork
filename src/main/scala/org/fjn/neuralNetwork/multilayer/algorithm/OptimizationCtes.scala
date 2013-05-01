@@ -13,6 +13,4 @@ trait OptimizationCtes extends Serializable{
   val momentum0:Double
   protected var lr:Double = 0.1
   protected var momentum:Double = 0.5
-
-
 }
