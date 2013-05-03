@@ -18,9 +18,9 @@ class Sigmoidea(val c:Double = 1.0) extends ActivationFunction  {
 
 
   def df(x: Double): Double = {
-//    val a = (f(x + 1e-7) - f(x - 1e-7)) / 2e-7
-//    a
-    2.0*c/(1.0 + math.exp(-c * x))
+    val a = (f(x + 1e-7) - f(x - 1e-7)) / 2e-7
+    a
+//    2.0*c/(1.0 + math.exp(-c * x))
   }
 
   val maxXLimit = 100d

@@ -19,7 +19,7 @@ case class PrincipalValueDecompositionNormalizer(originalTrainingSet: Array[Matr
 
   private def pca = {
 
-    val X = new Matrix[Double](originalTrainingSet.head.numberCols, originalTrainingSet.length)
+    val X = new Matrix[Double](originalTrainingSet.head.numberRows, originalTrainingSet.length)
 
     for{i <- originalTrainingSet.indices
         j <- originalTrainingSet(i).getArray().indices}{

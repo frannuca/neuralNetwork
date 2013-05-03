@@ -81,17 +81,21 @@ trait Network
 
       val errorNow = nnData.dataSet.indices.map(i =>{
         val orig = (rnd.nextDouble()*nnData.dataSet.length).toInt
-        learn(nnData.dataSet(orig%nnData.dataSet.length))
+        learn( nnData.dataSet(orig%nnData.dataSet.length))
       }).fold(0.0)((acc,v)=> acc+v)
 
+      dWs.foreach{case((i1,i2),w) => println(w.toString())}
+
+
       updateWeights
-      savedW
+
+      dWs.foreach{case((i1,i2),w) => println(w.toString())}
 
       if (errorNow<minError){
 
         saveW
         println("lr="+lr.toString)
-        lr = lr *0.75
+        //lr = lr *0.75
         minError=errorNow
 
       }
@@ -99,16 +103,17 @@ trait Network
         counterErrors = counterErrors + 1
       }
 
+      println("ERROR %s".format(errorNow))
 
-      if(counterErrors>20)
-      {
-        undoBackUp
-        counterErrors=0
-        Ws.foreach{
-          case ((i,j),w) => w <:= ( (w.clone.random -0.5) * 0.25 <= ((x) => 1+x))
-        }
-
-      }
+//      if(counterErrors>20)
+//      {
+//        undoBackUp
+//        counterErrors=0
+//        Ws.foreach{
+//          case ((i,j),w) => w <:= ( (w.clone.random -0.5) * 0.25 <= ((x) => 1+x))
+//        }
+//
+//      }
 
     }
 

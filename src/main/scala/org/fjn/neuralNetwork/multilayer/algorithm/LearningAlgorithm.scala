@@ -16,9 +16,14 @@ trait LearningAlgorithm extends Serializable with NNMatrixExtensions with Optimi
     var in = new Matrix[Double](1, 1)
     applyMasks
     self.layers.foreach {
-      case InputLayerExtractor(n) => in = self.layers(n).process(x)
-      case HiddenLayerExtractor(n) => self.layers(n).process(fillOnes(in).transpose * self.Ws((n - 1, n)))
-      case OutputLayerExtractor(n) => self.layers(n).process(fillOnes(in).transpose * self.Ws((n - 1, n)))
+      case InputLayerExtractor(n) =>
+        in = self.layers(n).process(x)
+      case HiddenLayerExtractor(n) =>
+        self.layers(n).process((fillOnes(in).transpose * self.Ws((n - 1, n))).transpose)
+        in = self.layers(n).getProcessedOutput
+      case OutputLayerExtractor(n) =>
+        self.layers(n).process((fillOnes(in).transpose * self.Ws((n - 1, n))).transpose)
+        in = self.layers(n).getProcessedOutput
     }
 
     in

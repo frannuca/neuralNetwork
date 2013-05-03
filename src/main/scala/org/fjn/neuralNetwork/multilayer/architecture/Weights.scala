@@ -62,10 +62,18 @@ trait Weights extends Serializable{
     WsBackup.foreach{case (key,value) => value <:= masks(key)}
   }
 
+
+  def cleardW={
+    dWs.foreach{
+      case (key,_)=> { dWs(key).zeros}
+    }
+  }
   def updateWeights{
     Ws.foreach{
       case (key,_)=> { Ws(key).copyFrom(Ws(key) - self.lr * dWs(key))}
     }
+
+    cleardW
     applyMasks
 
   }
