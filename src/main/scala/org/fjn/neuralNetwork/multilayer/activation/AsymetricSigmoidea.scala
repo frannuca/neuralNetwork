@@ -1,6 +1,6 @@
 package org.fjn.neuralNetwork.multilayer.activation
 
-class AsymetricSigmoidea(val c:Double=1.25) extends ActivationFunction  {
+class AsymetricSigmoidea(val c:Double=1.0) extends ActivationFunction  {
   def trigger = f _
   def diffTrigger = df _
 
@@ -12,8 +12,8 @@ class AsymetricSigmoidea(val c:Double=1.25) extends ActivationFunction  {
 
 
   def df(x: Double): Double = {
-    val a = (f(x + 1e-7) - f(x - 1e-7)) / 2e-7
-    a
+    val fx = f(x)
+    fx*(1.0-fx)
   }
 
   val maxXLimit = 100d

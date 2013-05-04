@@ -2,7 +2,7 @@ package org.fjn.neuralNetwork.multilayer
 
 import architecture.{NetworkData, FeedForwardNetwork}
 import org.specs2.mutable.Specification
-import activation.{Sigmoidea, ActivationFunction}
+import org.fjn.neuralNetwork.multilayer.activation.{AsymetricSigmoidea, Sigmoidea, ActivationFunction}
 
 import org.fjn.neuralNetwork.reader.{TrainingData}
 import org.fjn.neuralNetwork.generator.XORGenerator
@@ -27,19 +27,19 @@ class NN_test extends  Specification {
 
 
     val data = new NetworkData(
-      layerDimensions = Seq(2,3,3,1),
+      layerDimensions = Seq(2,5,1),
       activationFunction = new Sigmoidea(),
       dataSet = XORGenerator()
     )
 
     val ffnn = new FeedForwardNetwork(
     nnData = data,
-    lr0=1e-1,
+    lr0=0.5,
     momentum0 = 0.7
     )
 
 
-    val err = ffnn.solve(50)
+    val err = ffnn.solve(500)
 
     println("total Err"+err.toString)
 

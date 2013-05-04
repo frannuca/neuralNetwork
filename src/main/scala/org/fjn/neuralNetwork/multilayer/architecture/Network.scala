@@ -80,16 +80,17 @@ trait Network
       clearSaturationMeasures
 
       val errorNow = nnData.dataSet.indices.map(i =>{
-        val orig = (rnd.nextDouble()*nnData.dataSet.length).toInt
+        val orig = i//(rnd.nextDouble()*nnData.dataSet.length).toInt
         learn( nnData.dataSet(orig%nnData.dataSet.length))
       }).fold(0.0)((acc,v)=> acc+v)
 
-      dWs.foreach{case((i1,i2),w) => println(w.toString())}
+       Ws.foreach{case((i1,i2),w) => println((i1,i2).toString+"--"+w.toString())}
 
 
       updateWeights
 
-      dWs.foreach{case((i1,i2),w) => println(w.toString())}
+       Ws.foreach{case((i1,i2),w) => println((i1,i2).toString+"--"+w.toString())}
+
 
       if (errorNow<minError){
 
