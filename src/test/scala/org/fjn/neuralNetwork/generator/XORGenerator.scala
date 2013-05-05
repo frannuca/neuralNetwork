@@ -17,7 +17,7 @@ object XORGenerator {
     val out2 = new Matrix[Double](1,1) <= Seq(1.0)
 
     val in3 = new Matrix[Double](2,1) <= Seq(1.0,1.0)
-    val out3 = new Matrix[Double](1,1) <= Seq(1.0)
+    val out3 = new Matrix[Double](1,1) <= Seq(-1.0)
 
     Seq(
       new TrainingData(input = in0,output = out0),

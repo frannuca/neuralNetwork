@@ -27,7 +27,7 @@ class NN_test extends  Specification {
 
 
     val data = new NetworkData(
-      layerDimensions = Seq(2,5,1),
+      layerDimensions = Seq(2,6,2,1),
       activationFunction = new Sigmoidea(),
       dataSet = XORGenerator()
     )
@@ -39,7 +39,7 @@ class NN_test extends  Specification {
     )
 
 
-    val err = ffnn.solve(500)
+    val err = ffnn.solve(200)
 
     println("total Err"+err.toString)
 

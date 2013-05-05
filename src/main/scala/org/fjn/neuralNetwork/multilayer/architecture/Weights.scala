@@ -25,8 +25,9 @@ trait Weights extends Serializable{
   //generating Weight list strucuture
   lazy val Ws: mutable.Map[(Int, Int), Matrix[Double]] =
     generateListOfWeightMatrices.map{case (key,value)=> self.layers(key._1) match {
-      case InputLayerExtractor(_) => key -> value.random*0.01
-      case _ => key -> value.random*0.1
+      case InputLayerExtractor(_) => key -> value.random*0.1
+      case HiddenLayerExtractor(_) => key -> value.random
+      case OutputLayerExtractor(_) => key -> value.random*0.5
     }
     }
 
