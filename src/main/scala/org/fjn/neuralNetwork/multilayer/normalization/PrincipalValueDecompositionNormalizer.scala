@@ -11,7 +11,7 @@ import scala.collection.immutable.IndexedSeq
  * 2) optional elimination of the redundant dimensions
  * 3) normalization of the results into the dynamic ranges of the trigger function coordinate-axis
  */
-case class PrincipalValueDecompositionNormalizer(originalTrainingSet: Array[Matrix[Double]], triggerFunc: (Double) => Double) extends Normalizer {
+class PrincipalValueDecompositionNormalizer(val originalTrainingSet: Array[Matrix[Double]],val triggerFunc: (Double) => Double) extends Normalizer {
 
 
   val mean: Matrix[Double] =

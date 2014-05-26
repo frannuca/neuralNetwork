@@ -1,5 +1,5 @@
 
-scalaVersion := "2.9.2"
+//scalaVersion := "2.10.3"
 
 resolvers += "releases"  at "http://oss.sonatype.org/content/repositories/releases"
 
@@ -9,21 +9,6 @@ resolvers += Resolver.url("sbt-plugin-releases", new URL("http://scalasbt.artifa
 
 resolvers += "sbt-idea-repo" at "http://mpeltonen.github.com/maven/"
 
-resolvers += "sbt-idea-repo" at "http://mpeltonen.github.com/maven/"
-
-resolvers += Resolver.url("sbt-plugin-releases", new URL("http://scalasbt.artifactoryonline.com/scalasbt/sbt-plugin-releases/"))(Resolver.ivyStylePatterns)
-
 resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/"
 
-resolvers += "sbt-idea-repo" at "http://mpeltonen.github.com/maven/"
-
-resolvers ++= Seq("snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
-                    "releases"  at "http://oss.sonatype.org/content/repositories/releases")
-
-
-//addSbtPlugin("org.specs2" % "specs2_2.9.2" % "1.11" % "test")
-
-//addSbtPlugin("com.github.mpeltonen" % "sbt-idea" % "1.1.0")
-
-addSbtPlugin("com.github.mpeltonen" % "sbt-idea" % "1.2.0-SNAPSHOT")
 

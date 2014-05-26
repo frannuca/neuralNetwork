@@ -1,20 +1,19 @@
 package org.fjn.neuralNetwork.multilayer
 
-import architecture.{NetworkData, FeedForwardNetwork}
-import org.specs2.mutable.Specification
-import org.fjn.neuralNetwork.multilayer.activation.{AsymetricSigmoidea, Sigmoidea, ActivationFunction}
-
-import org.fjn.neuralNetwork.reader.{TrainingData}
+import org.scalatest.junit.AssertionsForJUnit
+import org.junit.Test
+import org.fjn.neuralNetwork.multilayer.architecture.{FeedForwardNetwork, NetworkData}
+import org.fjn.neuralNetwork.multilayer.activation.Sigmoidea
 import org.fjn.neuralNetwork.generator.XORGenerator
 
 
-class NN_test extends  Specification {
+class NN_test extends  AssertionsForJUnit {
 
-  "training a NN" should {
-    "run" in {
+  @Test def test1 {
 
-    `testAlgorithm` mustEqual true
-    }
+
+    assert(`testAlgorithm` == true)
+
   }
 
   def `testAlgorithm`={
