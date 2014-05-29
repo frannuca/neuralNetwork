@@ -4,6 +4,7 @@ import org.fjn.matrix.Matrix
 import org.fjn.matrix.Scalar2MatrixConversions
 import org.fjn.matrix.Scalar
 import org.fjn.neuralNetwork.reader.TrainingData
+import scala.collection.mutable.ListBuffer
 
 /**
  * Created by fran on 26/05/2014.
