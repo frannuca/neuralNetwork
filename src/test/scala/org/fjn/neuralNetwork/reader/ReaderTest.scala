@@ -18,7 +18,7 @@ class ReaderTest extends AssertionsForJUnit{
     val file0: URL = this.getClass().getResource(path)
     val file: BufferedSource = Source.fromURL(file0)
 
-    val sample = TrainingDataForWindow.read(file,2,60,5,15)
+    val sample = TrainingDataForWindow.read(file,2,60,5,15)(x=>x,x=>x)
 
 
   }

@@ -26,7 +26,27 @@ class ESNTests extends AssertionsForJUnit{
     val file0: URL = this.getClass().getResource(path)
     val file: BufferedSource = Source.fromURL(file0)
 
-    TrainingDataForWindow.read(file,2,90,0,10)
+
+
+    def processSeriesRegression(x:Array[Double]):Array[Double]= {
+
+      val V= new Matrix[Double](x.length,3)
+      val Y= new Matrix[Double](x.length,1)
+      for(n <- x.indices){
+        V(n,0) = 1.0
+        V(n,1)= n
+        V(n,2)= n*n
+        Y(n,0)=x(n)-x(0)
+      }
+
+      val A = V.transpose*V//3x3
+      A.invert
+      val w = A*V.transpose*Y
+
+      (x.indices.map(n => w(0,0)*1.0+w(1,0)*n+w(2,0)*n*n)).toArray
+    }
+
+    TrainingDataForWindow.read(file,2,120,0,10)(processSeriesRegression,processSeriesRegression)
 
   }
   @Test def testDowJones{
@@ -34,13 +54,13 @@ class ESNTests extends AssertionsForJUnit{
     val (samples,mean,norm) = getDowJonesTrainingData
     val Nin = samples.head.input.numberRows
     val Nout = samples.head.output.numberRows
-    val N = 700
+    val N = 500
 
     val s = new Sigmoidea()
     val enn= EchoStateNetwork(Nin=Nin,N=N,Nout=Nout,alpha=1.0,
       trigger = (x)=>s.f(x),data=samples.toArray,
       Wsparsity=30,
-      ridgeCoeff=1.0e-1,
+      ridgeCoeff=1.0,
       WInScale=2.0/Nin.toDouble)
     val X=enn.learn
 
@@ -51,21 +71,6 @@ class ESNTests extends AssertionsForJUnit{
     val r19: IndexedSeq[Double] =for(i <- 0 until X.numberRows) yield{
       X(i,19)
     }
-//    val err = (for(s <- samples) yield{
-//      val o =enn.computeOutput(s.input)
-//      val eo = s.output
-//      val d = (o-eo)
-//      val er=(d.transpose * d)(0,0)
-//
-//      println(s"computed=$o \n expected=$eo \n diff=$er \n")
-//
-//      er
-//    })
-//    println(enn.WOut)
-//    println(s"size=${err.length} error=$err")
-
-    val series_approx: IndexedSeq[Array[Double]] =  for(i<- 0 until samples.length/10-1) yield{ enn.computeOutput(samples(i*10).input).getArray()}
-    val series_expected: IndexedSeq[Array[Double]] = for(i<- 0 until samples.length/10-1) yield{samples(i*10).output.getArray()}
 
 
 
@@ -84,12 +89,14 @@ class ESNTests extends AssertionsForJUnit{
     // put the PlotPanel in a JFrame, as a JPanel
 
 
+    val series_approx = samples.drop(100).map(item => enn.computeOutput(item.input)).take(30)
+    val series_expected = samples.drop(100).map(item => item.output).take(30)
 
-    val r = (series_approx zip series_expected)
-      r.toSeq.foreach(pair => foo("expected",pair._1,pair._2))
+    val r: Seq[(Matrix[Double], Matrix[Double])] = (series_approx zip series_expected)
+      r.foreach(pair => foo("expected",pair._1.getArray(),pair._2.getArray()))
 
-    foo("r5",r5.toArray)
-    foo("r19",r19.toArray)
+//    foo("r5",r5.toArray)
+//    foo("r19",r19.toArray)
 
     val in = readLine()
   }
